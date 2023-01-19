@@ -1946,6 +1946,10 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
                                int   nof_symbols,
                                float scaling)
 {
+  // Frederik
+  DEBUG("Function srsran_precoding_diversity called.\n");
+  DEBUG("Number of symbols: %d", nof_symbols);
+  //
   int i;
   if (nof_ports == 2) {
     for (i = 0; i < nof_symbols; i++) {
