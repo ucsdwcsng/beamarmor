@@ -1948,7 +1948,7 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
 {
   // Frederik
   INFO("Function srsran_precoding_diversity called.\n");
-  INFO("Number of symbols: %d", nof_symbols);
+  INFO("Number of symbols: %d\n", nof_symbols);
   //
   int i;
   if (nof_ports == 2) {
