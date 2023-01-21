@@ -1947,8 +1947,8 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
                                float scaling)
 {
   // Frederik
-  printf("Function srsran_precoding_diversity called.\n");
-  printf("Number of symbols: %d\n", nof_symbols);
+  //printf("Function srsran_precoding_diversity called.\n");
+  //printf("Number of symbols: %d\n", nof_symbols);
   //
   int i;
   if (nof_ports == 2) {
@@ -1957,6 +1957,10 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
       y[1][2 * i]     = -conjf(x[1][i]);
       y[0][2 * i + 1] = x[1][i];
       y[1][2 * i + 1] = conjf(x[0][i]);
+      // Frederik
+      printf("x[0][%d]: %f +i%f", i, creal(x[0][i]), cimag(x[0][i]));
+      printf("x[1][%d]: %f +i%f", i, creal(x[1][i]), cimag(x[1][i]));
+      //
     }
     // normalize
     srsran_vec_sc_prod_cfc(y[0], scaling * M_SQRT1_2, y[0], 2 * nof_symbols);
