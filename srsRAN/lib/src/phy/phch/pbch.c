@@ -560,7 +560,7 @@ int srsran_pbch_encode(srsran_pbch_t* q,
                        uint32_t       frame_idx)
 {
   // Frederik
-  INFO("Function srsran_pbch_encode called.\n");
+  printf("Function srsran_pbch_encode called.\n");
   //
   int   i;
   int   nof_bits;
