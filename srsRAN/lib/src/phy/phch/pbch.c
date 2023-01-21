@@ -559,9 +559,6 @@ int srsran_pbch_encode(srsran_pbch_t* q,
                        cf_t*          sf_symbols[SRSRAN_MAX_PORTS],
                        uint32_t       frame_idx)
 {
-  // Frederik
-  printf("Function srsran_pbch_encode called.\n");
-  //
   int   i;
   int   nof_bits;
   cf_t* x[SRSRAN_MAX_LAYERS];
