@@ -375,6 +375,9 @@ static void put_pcfich(srsran_enb_dl_t* q)
 
 void srsran_enb_dl_put_base(srsran_enb_dl_t* q, srsran_dl_sf_cfg_t* dl_sf)
 {
+  // Frederik
+  INFO("eNB Downlink Object. Function srsran_enb_dl_put_base called.\n");
+  //
   srsran_ofdm_set_non_mbsfn_region(&q->ifft_mbsfn, dl_sf->non_mbsfn_region);
   q->dl_sf = *dl_sf;
   clear_sf(q);
