@@ -1949,21 +1949,31 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
   // Frederik
   //printf("Function srsran_precoding_diversity called.\n");
   //printf("Number of symbols: %d\n", nof_symbols);
+  int p1 = 1;
+  double complex p2 = 0 + exp(M_PI*I);
   //
   int i;
   if (nof_ports == 2) {
     for (i = 0; i < nof_symbols; i++) {
+      // Frederik
+      /* Original:
       y[0][2 * i]     = x[0][i];
       y[1][2 * i]     = -conjf(x[1][i]);
       y[0][2 * i + 1] = x[1][i];
       y[1][2 * i + 1] = conjf(x[0][i]);
-      // Frederik
+      end original */
+
+      y[0][i] = p1*x[0][i];
+      y[1][i] = p2*x[1][i];
+      
       printf("x[0][%d]: %f +i%f\n", i, creal(x[0][i]), cimag(x[0][i]));
       printf("x[1][%d]: %f +i%f\n", i, creal(x[1][i]), cimag(x[1][i]));
-      printf("y[0][%d]: %f +i%f\n", 2*i, creal(y[0][2*i]), cimag(y[0][2*i]));
-      printf("y[1][%d]: %f +i%f\n", 2*i, creal(y[1][2*i]), cimag(y[1][2*i]));
-      printf("y[0][%d]: %f +i%f\n", 2*i+1, creal(y[0][2*i+1]), cimag(y[0][2*i+1]));
-      printf("y[1][%d]: %f +i%f\n", 2*i+1, creal(y[1][2*i+1]), cimag(y[1][2*i+1]));
+      printf("y[0][%d]: %f +i%f\n", i, creal(y[0][i]), cimag(y[0][i]));
+      printf("y[1][%d]: %f +i%f\n", i, creal(y[1][i]), cimag(y[1][i]));
+      // printf("y[0][%d]: %f +i%f\n", 2*i, creal(y[0][2*i]), cimag(y[0][2*i]));
+      // printf("y[1][%d]: %f +i%f\n", 2*i, creal(y[1][2*i]), cimag(y[1][2*i]));
+      // printf("y[0][%d]: %f +i%f\n", 2*i+1, creal(y[0][2*i+1]), cimag(y[0][2*i+1]));
+      // printf("y[1][%d]: %f +i%f\n", 2*i+1, creal(y[1][2*i+1]), cimag(y[1][2*i+1]));
       printf("-------------------------------\n");
       //
     }
