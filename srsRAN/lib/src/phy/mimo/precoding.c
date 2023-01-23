@@ -1950,7 +1950,7 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
   //printf("Function srsran_precoding_diversity called.\n");
   //printf("Number of symbols: %d\n", nof_symbols);
   int p1 = 1;
-  double complex p2 = 0 + exp(M_PI*I);
+  double complex p2 = exp(M_PI*I);
   //
   int i;
   if (nof_ports == 2) {
