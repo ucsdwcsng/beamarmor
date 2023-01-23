@@ -1974,6 +1974,7 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
       // printf("y[1][%d]: %f +i%f\n", 2*i, creal(y[1][2*i]), cimag(y[1][2*i]));
       // printf("y[0][%d]: %f +i%f\n", 2*i+1, creal(y[0][2*i+1]), cimag(y[0][2*i+1]));
       // printf("y[1][%d]: %f +i%f\n", 2*i+1, creal(y[1][2*i+1]), cimag(y[1][2*i+1]));
+      printf("p2 = %f + i%f\n", creal(p2), cimag(p2));
       printf("-------------------------------\n");
       //
     }
