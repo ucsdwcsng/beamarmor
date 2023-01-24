@@ -31,6 +31,11 @@
 #include "srsran/phy/utils/simd.h"
 #include "srsran/phy/utils/vector.h"
 
+// Frederik
+#define DEG_TO_RAD M_PI/180
+FILE *fptr;
+//
+
 #ifdef LV_HAVE_SSE
 #include <immintrin.h>
 int srsran_predecoding_single_sse(cf_t* y[SRSRAN_MAX_PORTS],
@@ -1947,10 +1952,21 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
                                float scaling)
 {
   // Frederik
-  //printf("Function srsran_precoding_diversity called.\n");
-  //printf("Number of symbols: %d\n", nof_symbols);
   int p1 = 1;
-  double complex p2 = cexp(M_PI*I);
+  int theta_null;
+  double theta_beam_rad;
+  // Open and read file to set theta_null
+  fptr = fopen("theta_null.txt", "r");
+  fscanf(fptr,"%d", &theta_null);
+  printf("srsenb: Using theta_null: %d°\n", theta_null);
+  // Calculate theta_beam_rad from theta_null
+  if (sin(theta_null*DEG_TO_RAD) > 0) {
+    theta_beam_rad = asin(sin(theta_null*DEG_TO_RAD)-1);
+  } else {
+    theta_beam_rad = asin(sin(theta_null*DEG_TO_RAD)+1);
+  }
+  // Calcualte weight p2
+  double complex p2 = cexp(M_PI*sin(theta_beam_rad)*I);
   //
   int i;
   if (nof_ports == 2) {
