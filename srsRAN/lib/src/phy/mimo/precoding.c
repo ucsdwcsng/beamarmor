@@ -1953,7 +1953,7 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
 {
   // Frederik
   int p1 = 1;
-  char theta_null_char = "a";
+  char theta_null_char = 'a';
   int theta_null = 0;
   double theta_beam_rad;
   fptr = fopen("theta_null", "r");
