@@ -2,3 +2,4 @@
 *.m~
 srsRAN/build/
 .vscode/
+srsRAN/lib/src/phy/mimo/theta_null.txt
