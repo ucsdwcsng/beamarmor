@@ -13,6 +13,6 @@ for angle in range(-90,90):
     p = subprocess.Popen(["scp", "./srsRAN/lib/src/phy/mimo/theta_null.txt",
      "wcsng-23@137.110.198.34:/home/wcsng-23/gitrepos/beam_armor/srsRAN/lib/src/phy/mimo/theta_null.txt",
       "-P 2022",
-       "-i ~/.ssh/id_rsa_measurements"])
+       "-i ../../.ssh/id_rsa_measurements"])
     sts = os.waitpid(p.pid, 0)
     time.sleep(1)
