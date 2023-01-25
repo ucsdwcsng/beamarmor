@@ -3,3 +3,4 @@
 srsRAN/build/
 .vscode/
 srsRAN/lib/src/phy/mimo/theta_null.txt
+pwr_measure_all_angles
