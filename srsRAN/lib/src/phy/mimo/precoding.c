@@ -32,7 +32,7 @@
 #include "srsran/phy/utils/vector.h"
 
 // Frederik
-#define DEG_TO_RAD M_PI/180
+//#define DEG_TO_RAD M_PI/180
 FILE *fptr;
 //
 
@@ -1960,10 +1960,10 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
   // fscanf(fptr,"%d", &theta_null);
   // printf("srsenb: Using theta_null: %d°\n", theta_null);
   // Calculate theta_beam_rad from theta_null
-  if (sin(theta_null*DEG_TO_RAD) > 0) {
-    theta_beam_rad = asin(sin(theta_null*DEG_TO_RAD)-1);
+  if (sin(theta_null*M_PI/180) > 0) {
+    theta_beam_rad = asin(sin(theta_null*M_PI/180)-1);
   } else {
-    theta_beam_rad = asin(sin(theta_null*DEG_TO_RAD)+1);
+    theta_beam_rad = asin(sin(theta_null*M_PI/180)+1);
   }
   // Calcualte weight p2
   double complex p2 = cexp(M_PI*sin(theta_beam_rad)*I);
