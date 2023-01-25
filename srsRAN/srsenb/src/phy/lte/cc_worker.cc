@@ -236,6 +236,10 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
   std::lock_guard<std::mutex> lock(mutex);
   dl_sf = dl_sf_cfg;
 
+  // Frederik
+  printf("cc_worker::work_dl called.\n");
+  //
+
   // Put base signals (references, PBCH, PCFICH and PSS/SSS) into the resource grid
   srsran_enb_dl_put_base(&enb_dl, &dl_sf);
 

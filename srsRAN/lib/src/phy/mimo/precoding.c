@@ -32,8 +32,8 @@
 #include "srsran/phy/utils/vector.h"
 
 // Frederik
-//#define DEG_TO_RAD M_PI/180
-FILE *fptr;
+// #define DEG_TO_RAD M_PI/180
+// FILE *fptr;
 //
 
 #ifdef LV_HAVE_SSE
@@ -1953,10 +1953,10 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
 {
   // Frederik
   int p1 = 1;
-  char* file_content = malloc(4);
+  // char* file_content = malloc(4);
   int theta_null = 0;
   double theta_beam_rad;
-  fptr = fopen("theta_null", "r");
+  // fptr = fopen("theta_null", "r");
   // theta_null_char = fgetc(fptr);
   // fgets(file_content,3,fptr);
   // puts(file_content);
