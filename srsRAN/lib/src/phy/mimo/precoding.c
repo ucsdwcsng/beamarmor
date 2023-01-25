@@ -1957,7 +1957,7 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
   double theta_beam_rad;
   // Open and read file to set theta_null
   fptr = fopen("theta_null.txt", "r");
-  // fscanf(fptr,"%d", &theta_null);
+  theta_null = getw(fptr);
   printf("srsenb: Using theta_null: %d°\n", theta_null);
   // Calculate theta_beam_rad from theta_null
   if (sin(theta_null*M_PI/180) > 0) {
