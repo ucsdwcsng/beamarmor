@@ -1,5 +1,5 @@
 # This script is run on machine wcsng-23.
-# Run this FIRST
+# Run this FIRST and wait for srsenb to initialize
 # Use script "measure_sgnl_pwr_and_incr_theta_null.sh" to start recording samples
 # and advancing theta_null and iterate over a set of angles to measure.
 
@@ -13,5 +13,3 @@ echo "0" > srsRAN/lib/src/phy/mimo/theta_null.txt &
 sudo srsRAN/build/srsepc/src/srsepc &
 sleep 3
 sudo srsRAN/build/srsenb/src/srsenb &
-# Wait long enough for USRP to initialize
-sleep 10
