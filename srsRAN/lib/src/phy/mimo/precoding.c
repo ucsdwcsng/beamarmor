@@ -1953,14 +1953,14 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
 {
   // Frederik
   int p1 = 1;
-  char* file_content = (char*)malloc(3);
+  char* file_content = malloc(4);
   int theta_null = 0;
   double theta_beam_rad;
   fptr = fopen("theta_null", "r");
   // theta_null_char = fgetc(fptr);
   fgets(file_content,3,fptr);
-  puts(file_content);
-  fclose(fptr);
+  // puts(file_content);
+  // fclose(fptr);
   //printf("srsenb: Using theta_null: %d°\n", theta_null);
   // Calculate theta_beam_rad from theta_null
   if (sin(theta_null*M_PI/180) > 0) {
