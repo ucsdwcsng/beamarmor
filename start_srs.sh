@@ -11,7 +11,7 @@
 echo "0" > srsRAN/lib/src/phy/mimo/theta_null.txt &
 # Start srsenb and srsepc
 sudo srsRAN/build/srsepc/src/srsepc &
-sleep 2
+sleep 3
 sudo srsRAN/build/srsenb/src/srsenb &
-# Wait for srsenb to initialize
-sleep 6
+# Wait long enough for USRP to initialize
+sleep 10
