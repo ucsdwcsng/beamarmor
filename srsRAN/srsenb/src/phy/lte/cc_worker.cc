@@ -245,6 +245,7 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
   if (!input_file.is_open()) {
     printf("input_file not open\n");
   }
+  input_file >> number;
   printf("theta = %d\n", number);
   //
 
