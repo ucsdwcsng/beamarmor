@@ -245,7 +245,7 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
   std::ifstream input_file("../srsenb/src/phy/lte/theta_null.txt");
   if (!input_file.is_open()) {
     printf("input_file not open\n");
-    theta_null = 0;/srsenb/src/phy/lte/theta_null.txt
+    theta_null = 0;
   } else {
     input_file >> theta_null;
   }  
