@@ -253,15 +253,17 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
   //
 
   // Put base signals (references, PBCH, PCFICH and PSS/SSS) into the resource grid
+  // Frederik: Added theta_null as argument
   srsran_enb_dl_put_base(&enb_dl, &dl_sf, theta_null);
 
   // Put DL grants to resource grid. PDSCH data will be encoded as well.
   if (dl_sf_cfg.sf_type == SRSRAN_SF_NORM) {
     encode_pdcch_dl(dl_grants.pdsch, dl_grants.nof_grants);
-    encode_pdsch(dl_grants.pdsch, dl_grants.nof_grants);
+    // Frederik: Added theta_null as argument
+    encode_pdsch(dl_grants.pdsch, dl_grants.nof_grants, theta_null);
   } else {
     if (mbsfn_cfg->enable) {
-      encode_pmch(dl_grants.pdsch, mbsfn_cfg);/srsenb/src/phy/lte/theta_null.txt
+      encode_pmch(dl_grants.pdsch, mbsfn_cfg);
     }
   }
 
@@ -609,7 +611,7 @@ int cc_worker::encode_pmch(stack_interface_phy_lte::dl_sched_grant_t* grant, srs
   return SRSRAN_SUCCESS;
 }
 
-int cc_worker::encode_pdsch(stack_interface_phy_lte::dl_sched_grant_t* grants, uint32_t nof_grants)
+int cc_worker::encode_pdsch(stack_interface_phy_lte::dl_sched_grant_t* grants, uint32_t nof_grants, int theta_null)
 {
   /* Scales the Resources Elements affected by the power allocation (p_b) */
   // srsran_enb_dl_prepare_power_allocation(&enb_dl);
@@ -637,7 +639,7 @@ int cc_worker::encode_pdsch(stack_interface_phy_lte::dl_sched_grant_t* grants, u
       }
 
       // Encode PDSCH
-      if (srsran_enb_dl_put_pdsch(&enb_dl, &dl_cfg.pdsch, grants[i].data)) {
+      if (srsran_enb_dl_put_pdsch(&enb_dl, &dl_cfg.pdsch, grants[i].data, theta_null)) {
         Error("Error putting PDSCH %d", i);
         return SRSRAN_ERROR;
       }

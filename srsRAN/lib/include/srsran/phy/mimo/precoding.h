@@ -64,7 +64,8 @@ SRSRAN_API int srsran_precoding_type(cf_t*              x[SRSRAN_MAX_LAYERS],
                                      int                codebook_idx,
                                      int                nof_symbols,
                                      float              scaling,
-                                     srsran_tx_scheme_t type);
+                                     srsran_tx_scheme_t type,
+                                     int theta_null);
 
 /* Estimates the vector "x" based on the received signal "y" and the channel estimates "h"
  */

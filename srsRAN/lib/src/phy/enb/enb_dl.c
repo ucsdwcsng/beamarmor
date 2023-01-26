@@ -433,9 +433,9 @@ int srsran_enb_dl_put_pdcch_ul(srsran_enb_dl_t* q, srsran_dci_cfg_t* dci_cfg, sr
   return SRSRAN_SUCCESS;
 }
 
-int srsran_enb_dl_put_pdsch(srsran_enb_dl_t* q, srsran_pdsch_cfg_t* pdsch, uint8_t* data[SRSRAN_MAX_CODEWORDS])
+int srsran_enb_dl_put_pdsch(srsran_enb_dl_t* q, srsran_pdsch_cfg_t* pdsch, uint8_t* data[SRSRAN_MAX_CODEWORDS], int theta_null)
 {
-  return srsran_pdsch_encode(&q->pdsch, &q->dl_sf, pdsch, data, q->sf_symbols);
+  return srsran_pdsch_encode(&q->pdsch, &q->dl_sf, pdsch, data, q->sf_symbols, theta_null);
 }
 
 int srsran_enb_dl_put_pmch(srsran_enb_dl_t* q, srsran_pmch_cfg_t* pmch_cfg, uint8_t* data)

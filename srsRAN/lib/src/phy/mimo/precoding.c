@@ -2255,7 +2255,8 @@ int srsran_precoding_type(cf_t*              x[SRSRAN_MAX_LAYERS],
                           int                codebook_idx,
                           int                nof_symbols,
                           float              scaling,
-                          srsran_tx_scheme_t type)
+                          srsran_tx_scheme_t type,
+                          int theta_null)
 {
   if (nof_ports > SRSRAN_MAX_PORTS) {
     ERROR("Maximum number of ports is %d (nof_ports=%d)", SRSRAN_MAX_PORTS, nof_ports);
@@ -2279,7 +2280,7 @@ int srsran_precoding_type(cf_t*              x[SRSRAN_MAX_LAYERS],
       break;
     case SRSRAN_TXSCHEME_DIVERSITY:
       if (nof_ports == nof_layers) {
-        return srsran_precoding_diversity(x, y, nof_ports, nof_symbols, scaling);
+        return srsran_precoding_diversity(x, y, nof_ports, nof_symbols, scaling, theta_null);
       } else {
         ERROR("Error number of layers must equal number of ports in transmit diversity");
         return -1;

@@ -1018,7 +1018,8 @@ int srsran_pdsch_encode(srsran_pdsch_t*     q,
                         srsran_dl_sf_cfg_t* sf,
                         srsran_pdsch_cfg_t* cfg,
                         uint8_t*            data[SRSRAN_MAX_CODEWORDS],
-                        cf_t*               sf_symbols[SRSRAN_MAX_PORTS])
+                        cf_t*               sf_symbols[SRSRAN_MAX_PORTS],
+                        int theta_null)
 {
   int i;
   /* Set pointers for layermapping & precoding */
@@ -1114,7 +1115,8 @@ int srsran_pdsch_encode(srsran_pdsch_t*     q,
                             codebook_idx,
                             nof_symbols,
                             scaling,
-                            cfg->grant.tx_scheme);
+                            cfg->grant.tx_scheme,
+                            theta_null);
     } else {
       if (scaling == 1.0f) {
         memcpy(q->symbols[0], q->d[0], cfg->grant.nof_re * sizeof(cf_t));
