@@ -20,6 +20,9 @@
  */
 
 #include <iomanip>
+// Frederik
+#include <fstream>
+//
 
 #include "srsran/common/threads.h"
 #include "srsran/srsran.h"
