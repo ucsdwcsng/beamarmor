@@ -313,7 +313,8 @@ int srsran_phich_encode(srsran_phich_t*         q,
                         srsran_dl_sf_cfg_t*     sf,
                         srsran_phich_resource_t n_phich,
                         uint8_t                 ack,
-                        cf_t*                   sf_symbols[SRSRAN_MAX_PORTS])
+                        cf_t*                   sf_symbols[SRSRAN_MAX_PORTS],
+                        int theta_null)
 {
   int i;
 
@@ -406,7 +407,7 @@ int srsran_phich_encode(srsran_phich_t*         q,
   if (q->cell.nof_ports > 1) {
     srsran_layermap_diversity(q->d0, x, q->cell.nof_ports, SRSRAN_PHICH_MAX_NSYMB);
     srsran_precoding_diversity(
-        x, symbols_precoding, q->cell.nof_ports, SRSRAN_PHICH_MAX_NSYMB / q->cell.nof_ports, 1.0f);
+        x, symbols_precoding, q->cell.nof_ports, SRSRAN_PHICH_MAX_NSYMB / q->cell.nof_ports, 1.0f, theta_null);
     /**TODO: According to 6.9.2, Precoding for 4 tx ports is different! */
   } else {
     memcpy(q->sf_symbols[0], q->d0, SRSRAN_PHICH_MAX_NSYMB * sizeof(cf_t));

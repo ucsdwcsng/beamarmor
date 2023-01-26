@@ -268,10 +268,10 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
   }
 
   // Put UL grants to resource grid.
-  encode_pdcch_ul(ul_grants.pusch, ul_grants.nof_grants);
+  encode_pdcch_ul(ul_grants.pusch, ul_grants.nof_grants, theta_null);
 
   // Put pending PHICH HARQ ACK/NACK indications into subframe
-  encode_phich(ul_grants.phich, ul_grants.nof_phich);
+  encode_phich(ul_grants.phich, ul_grants.nof_phich, theta_null);
 
   // Generate signal and transmit
   srsran_enb_dl_gen_signal(&enb_dl);
@@ -492,11 +492,11 @@ int cc_worker::decode_pucch()
   return 0;
 }
 
-int cc_worker::encode_phich(stack_interface_phy_lte::ul_sched_ack_t* acks, uint32_t nof_acks)
+int cc_worker::encode_phich(stack_interface_phy_lte::ul_sched_ack_t* acks, uint32_t nof_acks, int theta_null)
 {
   for (uint32_t i = 0; i < nof_acks; i++) {
     if (acks[i].rnti && ue_db.count(acks[i].rnti)) {
-      srsran_enb_dl_put_phich(&enb_dl, &ue_db[acks[i].rnti]->phich_grant, acks[i].ack);
+      srsran_enb_dl_put_phich(&enb_dl, &ue_db[acks[i].rnti]->phich_grant, acks[i].ack, theta_null);
 
       Info("PHICH: rnti=0x%x, hi=%d, I_lowest=%d, n_dmrs=%d, tti_tx_dl=%d",
            acks[i].rnti,
@@ -509,7 +509,7 @@ int cc_worker::encode_phich(stack_interface_phy_lte::ul_sched_ack_t* acks, uint3
   return SRSRAN_SUCCESS;
 }
 
-int cc_worker::encode_pdcch_ul(stack_interface_phy_lte::ul_sched_grant_t* grants, uint32_t nof_grants)
+int cc_worker::encode_pdcch_ul(stack_interface_phy_lte::ul_sched_grant_t* grants, uint32_t nof_grants, int theta_null)
 {
   for (uint32_t i = 0; i < nof_grants; i++) {
     if (grants[i].needs_pdcch) {
@@ -528,7 +528,7 @@ int cc_worker::encode_pdcch_ul(stack_interface_phy_lte::ul_sched_grant_t* grants
         }
       }
 
-      if (srsran_enb_dl_put_pdcch_ul(&enb_dl, &dci_cfg, &grants[i].dci)) {
+      if (srsran_enb_dl_put_pdcch_ul(&enb_dl, &dci_cfg, &grants[i].dci, theta_null)) {
         Error("Error putting PUSCH %d", i);
         return SRSRAN_ERROR;
       }

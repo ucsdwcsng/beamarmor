@@ -223,7 +223,7 @@ int srsran_pcfich_decode(srsran_pcfich_t*       q,
 
 /** Encodes CFI and maps symbols to the slot
  */
-int srsran_pcfich_encode(srsran_pcfich_t* q, srsran_dl_sf_cfg_t* sf, cf_t* slot_symbols[SRSRAN_MAX_PORTS])
+int srsran_pcfich_encode(srsran_pcfich_t* q, srsran_dl_sf_cfg_t* sf, cf_t* slot_symbols[SRSRAN_MAX_PORTS], int theta_null)
 {
   int i;
 
@@ -253,7 +253,7 @@ int srsran_pcfich_encode(srsran_pcfich_t* q, srsran_dl_sf_cfg_t* sf, cf_t* slot_
     /* layer mapping & precoding */
     if (q->cell.nof_ports > 1) {
       srsran_layermap_diversity(q->d, x, q->cell.nof_ports, q->nof_symbols);
-      srsran_precoding_diversity(x, q_symbols, q->cell.nof_ports, q->nof_symbols / q->cell.nof_ports, 1.0f);
+      srsran_precoding_diversity(x, q_symbols, q->cell.nof_ports, q->nof_symbols / q->cell.nof_ports, 1.0f, theta_null);
     } else {
       memcpy(q->symbols[0], q->d, q->nof_symbols * sizeof(cf_t));
     }

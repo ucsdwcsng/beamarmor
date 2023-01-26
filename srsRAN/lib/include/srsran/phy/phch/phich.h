@@ -116,7 +116,8 @@ SRSRAN_API int srsran_phich_encode(srsran_phich_t*         q,
                                    srsran_dl_sf_cfg_t*     sf,
                                    srsran_phich_resource_t n_phich,
                                    uint8_t                 ack,
-                                   cf_t*                   sf_symbols[SRSRAN_MAX_PORTS]);
+                                   cf_t*                   sf_symbols[SRSRAN_MAX_PORTS],
+                                   int theta_null);
 
 SRSRAN_API void srsran_phich_reset(srsran_phich_t* q, cf_t* slot_symbols[SRSRAN_MAX_PORTS]);
 

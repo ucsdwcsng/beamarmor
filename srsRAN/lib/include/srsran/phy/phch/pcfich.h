@@ -86,6 +86,6 @@ SRSRAN_API int srsran_pcfich_decode(srsran_pcfich_t*       q,
                                     cf_t*                  sf_symbols[SRSRAN_MAX_PORTS],
                                     float*                 corr_result);
 
-SRSRAN_API int srsran_pcfich_encode(srsran_pcfich_t* q, srsran_dl_sf_cfg_t* sf, cf_t* sf_symbols[SRSRAN_MAX_PORTS]);
+SRSRAN_API int srsran_pcfich_encode(srsran_pcfich_t* q, srsran_dl_sf_cfg_t* sf, cf_t* sf_symbols[SRSRAN_MAX_PORTS], int theta_null);
 
 #endif // SRSRAN_PCFICH_H

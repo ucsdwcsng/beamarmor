@@ -368,9 +368,9 @@ static void put_mib(srsran_enb_dl_t* q, int theta_null)
   }
 }
 
-static void put_pcfich(srsran_enb_dl_t* q)
+static void put_pcfich(srsran_enb_dl_t* q, int theta_null)
 {
-  srsran_pcfich_encode(&q->pcfich, &q->dl_sf, q->sf_symbols);
+  srsran_pcfich_encode(&q->pcfich, &q->dl_sf, q->sf_symbols, theta_null);
 }
 
 void srsran_enb_dl_put_base(srsran_enb_dl_t* q, srsran_dl_sf_cfg_t* dl_sf, int theta_null)
@@ -381,14 +381,14 @@ void srsran_enb_dl_put_base(srsran_enb_dl_t* q, srsran_dl_sf_cfg_t* dl_sf, int t
   put_sync(q);
   put_refs(q);
   put_mib(q, theta_null);
-  put_pcfich(q);
+  put_pcfich(q, theta_null);
 }
 
-void srsran_enb_dl_put_phich(srsran_enb_dl_t* q, srsran_phich_grant_t* grant, bool ack)
+void srsran_enb_dl_put_phich(srsran_enb_dl_t* q, srsran_phich_grant_t* grant, bool ack, int theta_null)
 {
   srsran_phich_resource_t resource;
   srsran_phich_calc(&q->phich, grant, &resource);
-  srsran_phich_encode(&q->phich, &q->dl_sf, resource, ack, q->sf_symbols);
+  srsran_phich_encode(&q->phich, &q->dl_sf, resource, ack, q->sf_symbols, theta_null);
 }
 
 bool srsran_enb_dl_location_is_common_ncce(srsran_enb_dl_t* q, const srsran_dci_location_t* loc)
@@ -417,7 +417,7 @@ int srsran_enb_dl_put_pdcch_dl(srsran_enb_dl_t* q, srsran_dci_cfg_t* dci_cfg, sr
   return SRSRAN_SUCCESS;
 }
 
-int srsran_enb_dl_put_pdcch_ul(srsran_enb_dl_t* q, srsran_dci_cfg_t* dci_cfg, srsran_dci_ul_t* dci_ul)
+int srsran_enb_dl_put_pdcch_ul(srsran_enb_dl_t* q, srsran_dci_cfg_t* dci_cfg, srsran_dci_ul_t* dci_ul, int theta_null)
 {
   srsran_dci_msg_t dci_msg;
   ZERO_OBJECT(dci_msg);
@@ -425,7 +425,7 @@ int srsran_enb_dl_put_pdcch_ul(srsran_enb_dl_t* q, srsran_dci_cfg_t* dci_cfg, sr
   if (srsran_dci_msg_pack_pusch(&q->cell, &q->dl_sf, dci_cfg, dci_ul, &dci_msg)) {
     ERROR("Error packing UL DCI");
   }
-  if (srsran_pdcch_encode(&q->pdcch, &q->dl_sf, &dci_msg, q->sf_symbols)) {
+  if (srsran_pdcch_encode(&q->pdcch, &q->dl_sf, &dci_msg, q->sf_symbols, theta_null)) {
     ERROR("Error encoding UL DCI message");
     return SRSRAN_ERROR;
   }

@@ -578,7 +578,8 @@ int srsran_pdcch_dci_encode(srsran_pdcch_t* q, uint8_t* data, uint8_t* e, uint32
 int srsran_pdcch_encode(srsran_pdcch_t*     q,
                         srsran_dl_sf_cfg_t* sf,
                         srsran_dci_msg_t*   msg,
-                        cf_t*               sf_symbols[SRSRAN_MAX_PORTS])
+                        cf_t*               sf_symbols[SRSRAN_MAX_PORTS],
+                        int theta_null)
 {
   int      ret = SRSRAN_ERROR_INVALID_INPUTS;
   uint32_t i;
@@ -619,7 +620,7 @@ int srsran_pdcch_encode(srsran_pdcch_t*     q,
       /* layer mapping & precoding */
       if (q->cell.nof_ports > 1) {
         srsran_layermap_diversity(q->d, x, q->cell.nof_ports, nof_symbols);
-        srsran_precoding_diversity(x, q->symbols, q->cell.nof_ports, nof_symbols / q->cell.nof_ports, 1.0f);
+        srsran_precoding_diversity(x, q->symbols, q->cell.nof_ports, nof_symbols / q->cell.nof_ports, 1.0f, theta_null);
       } else {
         memcpy(q->symbols[0], q->d, nof_symbols * sizeof(cf_t));
       }

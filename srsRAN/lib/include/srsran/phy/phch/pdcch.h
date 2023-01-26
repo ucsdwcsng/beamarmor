@@ -91,7 +91,8 @@ SRSRAN_API float srsran_pdcch_coderate(uint32_t nof_bits, uint32_t l);
 SRSRAN_API int srsran_pdcch_encode(srsran_pdcch_t*     q,
                                    srsran_dl_sf_cfg_t* sf,
                                    srsran_dci_msg_t*   msg,
-                                   cf_t*               sf_symbols[SRSRAN_MAX_PORTS]);
+                                   cf_t*               sf_symbols[SRSRAN_MAX_PORTS],
+                                   int theta_null);
 
 /* Decoding functions: Extract the LLRs and save them in the srsran_pdcch_t object */
 
