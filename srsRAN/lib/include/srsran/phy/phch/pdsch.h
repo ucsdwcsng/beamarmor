@@ -102,7 +102,7 @@ SRSRAN_API int srsran_pdsch_encode(srsran_pdsch_t*     q,
                                    srsran_pdsch_cfg_t* cfg,
                                    uint8_t*            data[SRSRAN_MAX_CODEWORDS],
                                    cf_t*               sf_symbols[SRSRAN_MAX_PORTS],
-                                   int theta_null)
+                                   int theta_null);
 
 SRSRAN_API int srsran_pdsch_decode(srsran_pdsch_t*        q,
                                    srsran_dl_sf_cfg_t*    sf,
