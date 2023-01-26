@@ -254,13 +254,13 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
 
   // Put base signals (references, PBCH, PCFICH and PSS/SSS) into the resource grid
   // Frederik: Added theta_null as argument
-  srsran_enb_dl_put_base(&enb_dl, &dl_sf, theta_null);
+  srsran_enb_dl_put_base(&enb_dl, &dl_sf, 42);
 
   // Put DL grants to resource grid. PDSCH data will be encoded as well.
   if (dl_sf_cfg.sf_type == SRSRAN_SF_NORM) {
     encode_pdcch_dl(dl_grants.pdsch, dl_grants.nof_grants);
     // Frederik: Added theta_null as argument
-    encode_pdsch(dl_grants.pdsch, dl_grants.nof_grants, theta_null);
+    encode_pdsch(dl_grants.pdsch, dl_grants.nof_grants, 21);
   } else {
     if (mbsfn_cfg->enable) {
       encode_pmch(dl_grants.pdsch, mbsfn_cfg);
