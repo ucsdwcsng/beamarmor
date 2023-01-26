@@ -47,7 +47,8 @@ SRSRAN_API int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
                                           cf_t* y[SRSRAN_MAX_PORTS],
                                           int   nof_ports,
                                           int   nof_symbols,
-                                          float scaling);
+                                          float scaling,
+                                          int theta_null);
 
 SRSRAN_API int srsran_precoding_cdd(cf_t* x[SRSRAN_MAX_LAYERS],
                                     cf_t* y[SRSRAN_MAX_PORTS],

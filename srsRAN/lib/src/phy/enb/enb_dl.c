@@ -355,7 +355,7 @@ static void put_refs(srsran_enb_dl_t* q)
   }
 }
 
-static void put_mib(srsran_enb_dl_t* q)
+static void put_mib(srsran_enb_dl_t* q, int theta_null)
 {
   uint8_t bch_payload[SRSRAN_BCH_PAYLOAD_LEN];
 
@@ -364,7 +364,7 @@ static void put_mib(srsran_enb_dl_t* q)
 
   if (sf_idx == 0) {
     srsran_pbch_mib_pack(&q->cell, sfn, bch_payload);
-    srsran_pbch_encode(&q->pbch, bch_payload, q->sf_symbols, sfn % 4);
+    srsran_pbch_encode(&q->pbch, bch_payload, q->sf_symbols, sfn % 4, theta_null);
   }
 }
 
@@ -373,14 +373,14 @@ static void put_pcfich(srsran_enb_dl_t* q)
   srsran_pcfich_encode(&q->pcfich, &q->dl_sf, q->sf_symbols);
 }
 
-void srsran_enb_dl_put_base(srsran_enb_dl_t* q, srsran_dl_sf_cfg_t* dl_sf)
+void srsran_enb_dl_put_base(srsran_enb_dl_t* q, srsran_dl_sf_cfg_t* dl_sf, int theta_null)
 {
   srsran_ofdm_set_non_mbsfn_region(&q->ifft_mbsfn, dl_sf->non_mbsfn_region);
   q->dl_sf = *dl_sf;
   clear_sf(q);
   put_sync(q);
   put_refs(q);
-  put_mib(q);
+  put_mib(q, theta_null);
   put_pcfich(q);
 }
 

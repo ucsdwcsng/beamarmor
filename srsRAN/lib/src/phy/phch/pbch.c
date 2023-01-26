@@ -557,7 +557,8 @@ int srsran_pbch_decode(srsran_pbch_t*         q,
 int srsran_pbch_encode(srsran_pbch_t* q,
                        uint8_t        bch_payload[SRSRAN_BCH_PAYLOAD_LEN],
                        cf_t*          sf_symbols[SRSRAN_MAX_PORTS],
-                       uint32_t       frame_idx)
+                       uint32_t       frame_idx,
+                       int theta_null)
 {
   int   i;
   int   nof_bits;
@@ -591,7 +592,7 @@ int srsran_pbch_encode(srsran_pbch_t* q,
     /* layer mapping & precoding */
     if (q->cell.nof_ports > 1) {
       srsran_layermap_diversity(q->d, x, q->cell.nof_ports, q->nof_symbols);
-      srsran_precoding_diversity(x, q->symbols, q->cell.nof_ports, q->nof_symbols / q->cell.nof_ports, 1.0f);
+      srsran_precoding_diversity(x, q->symbols, q->cell.nof_ports, q->nof_symbols / q->cell.nof_ports, 1.0f, theta_null);
     } else {
       memcpy(q->symbols[0], q->d, q->nof_symbols * sizeof(cf_t));
     }

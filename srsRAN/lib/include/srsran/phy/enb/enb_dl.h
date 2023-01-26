@@ -108,7 +108,7 @@ SRSRAN_API int srsran_enb_dl_set_cfr(srsran_enb_dl_t* q, const srsran_cfr_cfg_t*
 
 SRSRAN_API bool srsran_enb_dl_location_is_common_ncce(srsran_enb_dl_t* q, const srsran_dci_location_t* loc);
 
-SRSRAN_API void srsran_enb_dl_put_base(srsran_enb_dl_t* q, srsran_dl_sf_cfg_t* dl_sf);
+SRSRAN_API void srsran_enb_dl_put_base(srsran_enb_dl_t* q, srsran_dl_sf_cfg_t* dl_sf, int theta_null);
 
 SRSRAN_API void srsran_enb_dl_put_phich(srsran_enb_dl_t* q, srsran_phich_grant_t* grant, bool ack);
 

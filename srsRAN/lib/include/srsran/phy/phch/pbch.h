@@ -97,7 +97,8 @@ SRSRAN_API int srsran_pbch_decode(srsran_pbch_t*         q,
 SRSRAN_API int srsran_pbch_encode(srsran_pbch_t* q,
                                   uint8_t        bch_payload[SRSRAN_BCH_PAYLOAD_LEN],
                                   cf_t*          sf_symbols[SRSRAN_MAX_PORTS],
-                                  uint32_t       frame_idx);
+                                  uint32_t       frame_idx,
+                                  int theta_null);
 
 SRSRAN_API void srsran_pbch_decode_reset(srsran_pbch_t* q);
 

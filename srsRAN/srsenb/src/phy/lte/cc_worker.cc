@@ -240,17 +240,20 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
   dl_sf = dl_sf_cfg;
 
   // Frederik
-  int number = 21;
+  // Read theta_null from file
+  int theta_null;
   std::ifstream input_file("../srsenb/src/phy/lte/theta_null.txt");
   if (!input_file.is_open()) {
     printf("input_file not open\n");
-  }
-  input_file >> number;
-  printf("theta = %d\n", number);
+    theta_null = 0;/srsenb/src/phy/lte/theta_null.txt
+  } else {
+    input_file >> theta_null;
+  }  
+  // printf("theta_null = %d\n", theta_null);
   //
 
   // Put base signals (references, PBCH, PCFICH and PSS/SSS) into the resource grid
-  srsran_enb_dl_put_base(&enb_dl, &dl_sf);
+  srsran_enb_dl_put_base(&enb_dl, &dl_sf, theta_null);
 
   // Put DL grants to resource grid. PDSCH data will be encoded as well.
   if (dl_sf_cfg.sf_type == SRSRAN_SF_NORM) {
@@ -258,7 +261,7 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
     encode_pdsch(dl_grants.pdsch, dl_grants.nof_grants);
   } else {
     if (mbsfn_cfg->enable) {
-      encode_pmch(dl_grants.pdsch, mbsfn_cfg);
+      encode_pmch(dl_grants.pdsch, mbsfn_cfg);/srsenb/src/phy/lte/theta_null.txt
     }
   }
 
