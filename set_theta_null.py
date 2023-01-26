@@ -15,4 +15,4 @@ for angle in range(-90,90):
         "./srsRAN/srsenb/src/phy/lte/theta_null.txt",
         "wcsng-23@137.110.198.34:/home/wcsng-23/gitrepos/beam_armor/srsRAN/srsenb/src/phy/lte/theta_null.txt"])
     sts = os.waitpid(p.pid, 0)
-    time.sleep(1)
+    time.sleep(0.1)
