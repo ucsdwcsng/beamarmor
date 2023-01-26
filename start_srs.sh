@@ -8,7 +8,7 @@
 # theta_null is the angle at which we want to create a null/low signal power.
 
 # Set first angle to 0.
-echo "0" > srsRAN/lib/src/phy/mimo/theta_null.txt &
+echo "0" > /srsRAN/srsenb/src/phy/lte/theta_null.txt &
 # Start srsenb and srsepc
 sudo srsRAN/build/srsepc/src/srsepc &
 sleep 3

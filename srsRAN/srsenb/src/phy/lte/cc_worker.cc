@@ -248,8 +248,7 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
     theta_null = 0;
   } else {
     input_file >> theta_null;
-  }  
-  // printf("theta_null = %d\n", theta_null);
+  }
   //
 
   // Put base signals (references, PBCH, PCFICH and PSS/SSS) into the resource grid
@@ -268,9 +267,11 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
   }
 
   // Put UL grants to resource grid.
+  // Frederik: Added theta_null as argument
   encode_pdcch_ul(ul_grants.pusch, ul_grants.nof_grants, theta_null);
 
   // Put pending PHICH HARQ ACK/NACK indications into subframe
+  // Frederik: Added theta_null as argument
   encode_phich(ul_grants.phich, ul_grants.nof_phich, theta_null);
 
   // Generate signal and transmit
