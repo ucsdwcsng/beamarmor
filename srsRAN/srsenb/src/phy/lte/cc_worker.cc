@@ -242,8 +242,9 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
   // Frederik
   int number = 21;
   ifstream input_file("theta_null.txt");
-  number << input_file;
+  input_file >> number;
   printf("theta = %d\n", number);
+  getchar();
   //
 
   // Put base signals (references, PBCH, PCFICH and PSS/SSS) into the resource grid
