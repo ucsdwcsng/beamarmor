@@ -238,8 +238,7 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
 
   // Frederik
   int number;
-  string filename("theta_null.txt");
-  ifstream input_file(filename);
+  std::fstream input_file("theta_null.txt", std::ios_base::in);
   input_file >> number;
   printf("theta = %d\n", number);
   //
