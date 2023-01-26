@@ -401,7 +401,7 @@ bool srsran_enb_dl_location_is_common_ncce(srsran_enb_dl_t* q, const srsran_dci_
   }
 }
 
-int srsran_enb_dl_put_pdcch_dl(srsran_enb_dl_t* q, srsran_dci_cfg_t* dci_cfg, srsran_dci_dl_t* dci_dl)
+int srsran_enb_dl_put_pdcch_dl(srsran_enb_dl_t* q, srsran_dci_cfg_t* dci_cfg, srsran_dci_dl_t* dci_dl, int theta_null)
 {
   srsran_dci_msg_t dci_msg;
   ZERO_OBJECT(dci_msg);
@@ -409,7 +409,7 @@ int srsran_enb_dl_put_pdcch_dl(srsran_enb_dl_t* q, srsran_dci_cfg_t* dci_cfg, sr
   if (srsran_dci_msg_pack_pdsch(&q->cell, &q->dl_sf, dci_cfg, dci_dl, &dci_msg)) {
     ERROR("Error packing DL DCI");
   }
-  if (srsran_pdcch_encode(&q->pdcch, &q->dl_sf, &dci_msg, q->sf_symbols)) {
+  if (srsran_pdcch_encode(&q->pdcch, &q->dl_sf, &dci_msg, q->sf_symbols, theta_null)) {
     ERROR("Error encoding DL DCI message");
     return SRSRAN_ERROR;
   }
