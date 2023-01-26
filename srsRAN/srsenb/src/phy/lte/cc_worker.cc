@@ -241,7 +241,7 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
 
   // Frederik
   int number = 21;
-  std::ifstream input_file("theta_null.txt");
+  std::fstream input_file("theta_null.txt");
   if (!input_file.is_open()) {
     printf("input_file not open\n");
   }
