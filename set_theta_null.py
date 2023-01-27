@@ -9,7 +9,7 @@ import subprocess
 timestamps = []
 time_0 = time.time()
 
-for angle in range(-90,90):
+for angle in range(-90,91):
     print("Setting angle to "+str(angle)+"°")
     with open('./srsRAN/srsenb/src/phy/lte/theta_null.txt', 'w') as f:
         f.write(str(angle))
