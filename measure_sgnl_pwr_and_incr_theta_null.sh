@@ -8,8 +8,7 @@
 # before iterating theta_null.
 
 # Start recording samples
-# 281M smaples: (1M samples per 1° angle)*181 angles + 10M*10 sec wait
-uhd_rx_cfile -f 2680M -r 10M -N 281M pwr_measure_all_angles &
+uhd_rx_cfile -f 2680M -r 10M -N 600M pwr_measure_all_angles &
 # Wait long enough for USRP to initialize
 sleep 10
 # Start python script to increment over angles of theta_null

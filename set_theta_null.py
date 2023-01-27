@@ -6,6 +6,9 @@ import time
 import os
 import subprocess
 
+timestamps = []
+time_0 = time.time()
+
 for angle in range(-90,90):
     print("Setting angle to "+str(angle)+"°")
     with open('./srsRAN/srsenb/src/phy/lte/theta_null.txt', 'w') as f:
@@ -15,4 +18,9 @@ for angle in range(-90,90):
         "./srsRAN/srsenb/src/phy/lte/theta_null.txt",
         "wcsng-23@137.110.198.34:/home/wcsng-23/gitrepos/beam_armor/srsRAN/srsenb/src/phy/lte/theta_null.txt"])
     sts = os.waitpid(p.pid, 0)
-    time.sleep(0.1)
+    timestamps.append(time.time()-time_0)
+    #time.sleep(0.1)
+
+with open('timestamps.txt', 'w') as f:
+    for timestamp in timestamps:
+        f.write(str(timestamp)+',')
