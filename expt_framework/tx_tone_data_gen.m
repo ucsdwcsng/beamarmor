@@ -25,8 +25,8 @@ phase_modulated_wave = reshape(repmat(exp(1j*deg2rad(phase_variation)), samples_
 tone_data2 = tone_data1.*phase_modulated_wave.';
 
 
-write_complex_binary('/temp/tx_data1.iq', tone_data1)
-write_complex_binary('/temp/tx_data2.iq', tone_data2)
+write_complex_binary(tone_data1,'/tmp/tx_data1.iq')
+write_complex_binary(tone_data2,'/tmp/tx_data2.iq')
 
 figure(2); clf;
 plot(rad2deg(angle(phase_modulated_wave)))
