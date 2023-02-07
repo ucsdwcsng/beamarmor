@@ -7,7 +7,7 @@ clearvars;
 % create beam null and plot the pattern
 
 N = 2; %number of antennas
-theta_null = -30; %angle for creating null in degree
+theta_null = 0; %angle for creating null in degree
 
 if(sind(theta_null)>0)
 theta_beam = asind(sind(theta_null)-1); %deg beam direction
