@@ -1,8 +1,8 @@
 % total number of samples measured
-n = 10e6;
-start=10e6;
+n = 1.8e6;
+% start=10e6;
 % Read the complex I/Q samples from file 
-iq_samples = read_complex_binary('pwr_measure_all_angles', n, start);
+iq_samples = read_complex_binary('pwr_measure_all_angles', n;
 
 %
 % figure(1); clf;
