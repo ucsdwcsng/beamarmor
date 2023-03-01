@@ -238,7 +238,7 @@ static int test_case1()
 
         // Encode
         gettimeofday(&t[1], NULL);
-        TESTASSERT(srsran_pdcch_encode(&pdcch_tx, &dl_sf_cfg, &dci_tx, slot_symbols) == SRSRAN_SUCCESS);
+        TESTASSERT(srsran_pdcch_encode(&pdcch_tx, &dl_sf_cfg, &dci_tx, slot_symbols, 42) == SRSRAN_SUCCESS);
         gettimeofday(&t[2], NULL);
         get_time_interval(t);
         t_encode_us += (size_t)(t[0].tv_sec * 1e6 + t[0].tv_usec);

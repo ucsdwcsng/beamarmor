@@ -535,7 +535,7 @@ int srsran_npdcch_encode(srsran_npdcch_t*      q,
       // layer mapping & precoding
       if (q->cell.nof_ports > 1) {
         srsran_layermap_diversity(q->d, x, q->cell.nof_ports, nof_symbols);
-        srsran_precoding_diversity(x, q->symbols, q->cell.nof_ports, nof_symbols / q->cell.nof_ports, 1.0);
+        srsran_precoding_diversity(x, q->symbols, q->cell.nof_ports, nof_symbols / q->cell.nof_ports, 1.0, 42);
       } else {
         memcpy(q->symbols[0], q->d, nof_symbols * sizeof(cf_t));
       }

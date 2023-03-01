@@ -173,7 +173,7 @@ int main(int argc, char** argv)
 
           ack[ngroup][nseq] = (uint8_t)srsran_random_uniform_int_dist(random_gen, 0, 1);
 
-          srsran_phich_encode(&phich, &dl_sf, resource, ack[ngroup][nseq], slot_symbols);
+          srsran_phich_encode(&phich, &dl_sf, resource, ack[ngroup][nseq], slot_symbols, 42);
         }
       }
       /* combine outputs */

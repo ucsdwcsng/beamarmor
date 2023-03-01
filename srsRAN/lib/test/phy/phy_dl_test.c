@@ -158,8 +158,8 @@ int work_enb(srsran_enb_dl_t*         enb_dl,
 {
   int ret = SRSRAN_ERROR;
 
-  srsran_enb_dl_put_base(enb_dl, dl_sf);
-  if (srsran_enb_dl_put_pdcch_dl(enb_dl, dci_cfg, dci)) {
+  srsran_enb_dl_put_base(enb_dl, dl_sf, 42);
+  if (srsran_enb_dl_put_pdcch_dl(enb_dl, dci_cfg, dci, 42)) {
     ERROR("Error putting PDCCH sf_idx=%d", dl_sf->tti);
     goto quit;
   }
@@ -185,7 +185,7 @@ int work_enb(srsran_enb_dl_t*         enb_dl,
   pdsch_cfg.rnti         = rnti;
   pdsch_cfg.meas_time_en = false;
 
-  if (srsran_enb_dl_put_pdsch(enb_dl, &pdsch_cfg, data_tx) < 0) {
+  if (srsran_enb_dl_put_pdsch(enb_dl, &pdsch_cfg, data_tx, 42) < 0) {
     ERROR("Error putting PDSCH sf_idx=%d", dl_sf->tti);
     goto quit;
   }

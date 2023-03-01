@@ -146,11 +146,11 @@ public:
     int      ret    = SRSRAN_SUCCESS;
     uint32_t sf_len = SRSRAN_SF_LEN_PRB(enb_dl.cell.nof_prb);
 
-    srsran_enb_dl_put_base(&enb_dl, dl_sf);
+    srsran_enb_dl_put_base(&enb_dl, dl_sf, 42);
 
     // Put PDSCH only if it is required
     if (dci && dci_cfg && softbuffer_tx && data_tx) {
-      if (srsran_enb_dl_put_pdcch_dl(&enb_dl, dci_cfg, dci)) {
+      if (srsran_enb_dl_put_pdcch_dl(&enb_dl, dci_cfg, dci, 42)) {
         ERROR("Error putting PDCCH sf_idx=%d", dl_sf->tti);
         ret = SRSRAN_ERROR;
       }
@@ -176,7 +176,7 @@ public:
       pdsch_cfg.rnti         = serving_cell_pdsch_rnti;
       pdsch_cfg.meas_time_en = false;
 
-      if (srsran_enb_dl_put_pdsch(&enb_dl, &pdsch_cfg, data_tx) < 0) {
+      if (srsran_enb_dl_put_pdsch(&enb_dl, &pdsch_cfg, data_tx, 42) < 0) {
         ERROR("Error putting PDSCH sf_idx=%d", dl_sf->tti);
         ret = SRSRAN_ERROR;
       }

@@ -702,7 +702,7 @@ int srsran_npdsch_encode_seq(srsran_npdsch_t*        q,
       // TODO: only diversity supported
       if (q->cell.base.nof_ports > 1) {
         srsran_layermap_diversity(q->d, x, q->cell.base.nof_ports, len);
-        srsran_precoding_diversity(x, q->tx_syms, q->cell.base.nof_ports, len / q->cell.base.nof_ports, 1.0);
+        srsran_precoding_diversity(x, q->tx_syms, q->cell.base.nof_ports, len / q->cell.base.nof_ports, 1.0, 42);
       } else {
         memcpy(q->tx_syms[0], q->d, len * sizeof(cf_t));
       }

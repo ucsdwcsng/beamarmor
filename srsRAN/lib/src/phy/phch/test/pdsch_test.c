@@ -427,7 +427,7 @@ int main(int argc, char** argv)
         pdsch_cfg.grant.tb[i].rv = 0;
       }
       /* Do 1st transmission for rv_idx!=0 */
-      if (srsran_pdsch_encode(&pdsch_tx, &dl_sf, &pdsch_cfg, data_tx, tx_slot_symbols)) {
+      if (srsran_pdsch_encode(&pdsch_tx, &dl_sf, &pdsch_cfg, data_tx, tx_slot_symbols, 42)) {
         ERROR("Error encoding PDSCH");
         goto quit;
       }
@@ -437,7 +437,7 @@ int main(int argc, char** argv)
       pdsch_cfg.grant.tb[i].rv = rv_idx[i];
     }
     for (uint32_t k = 0; k < M; k++) {
-      if (srsran_pdsch_encode(&pdsch_tx, &dl_sf, &pdsch_cfg, data_tx, tx_slot_symbols)) {
+      if (srsran_pdsch_encode(&pdsch_tx, &dl_sf, &pdsch_cfg, data_tx, tx_slot_symbols, 42)) {
         ERROR("Error encoding PDSCH");
         goto quit;
       }

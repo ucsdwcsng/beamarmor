@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 
       for (cfi = 1; cfi < 4; cfi++) {
         dl_sf.cfi = cfi;
-        srsran_pcfich_encode(&pcfich, &dl_sf, slot_symbols);
+        srsran_pcfich_encode(&pcfich, &dl_sf, slot_symbols, 42);
 
         /* combine outputs */
         for (i = 1; i < cell.nof_ports; i++) {

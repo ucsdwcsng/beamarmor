@@ -433,7 +433,7 @@ public:
       logger.debug("-- generating DL baseband SFN=%" PRId64 " TTI=%d;", sfn, dl_sf_cfg.tti);
 
       // Create empty resource grid with basic signals
-      srsran_enb_dl_put_base(&enb_dl, &dl_sf_cfg);
+      srsran_enb_dl_put_base(&enb_dl, &dl_sf_cfg, 42);
 
       // Generate signal and transmit
       srsran_enb_dl_gen_signal(&enb_dl);

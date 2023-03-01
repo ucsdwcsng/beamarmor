@@ -267,7 +267,7 @@ int main(int argc, char** argv)
   }
 
   /* Execute Precoding (Tx) */
-  if (srsran_precoding_type(x, y, nof_layers, nof_tx_ports, codebook_idx, nof_symbols, scaling, type) < 0) {
+  if (srsran_precoding_type(x, y, nof_layers, nof_tx_ports, codebook_idx, nof_symbols, scaling, type, 42) < 0) {
     ERROR("Error layer mapper encoder");
     exit(-1);
   }

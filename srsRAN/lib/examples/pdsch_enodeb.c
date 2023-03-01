@@ -1050,13 +1050,13 @@ int main(int argc, char** argv)
 
       srsran_pbch_mib_pack(&cell, sfn, bch_payload);
       if (sf_idx == 0) {
-        srsran_pbch_encode(&pbch, bch_payload, sf_symbols, nf % 4);
+        srsran_pbch_encode(&pbch, bch_payload, sf_symbols, nf % 4, 42);
       }
 
       dl_sf.tti = nf * 10 + sf_idx;
       dl_sf.cfi = cfi;
 
-      srsran_pcfich_encode(&pcfich, &dl_sf, sf_symbols);
+      srsran_pcfich_encode(&pcfich, &dl_sf, sf_symbols, 42);
 
       /* Update DL resource allocation from control port */
       if (update_control() < SRSRAN_SUCCESS) {
@@ -1094,7 +1094,7 @@ int main(int argc, char** argv)
 
           srsran_dci_msg_pack_pdsch(&cell, &dl_sf, NULL, &dci_dl, &dci_msg);
           dci_msg.location = locations[sf_idx][0];
-          if (srsran_pdcch_encode(&pdcch, &dl_sf, &dci_msg, sf_symbols)) {
+          if (srsran_pdcch_encode(&pdcch, &dl_sf, &dci_msg, sf_symbols, 42)) {
             ERROR("Error encoding DCI message");
             exit(-1);
           }
@@ -1106,7 +1106,7 @@ int main(int argc, char** argv)
           }
 
           /* Encode PDSCH */
-          if (srsran_pdsch_encode(&pdsch, &dl_sf, &pdsch_cfg, data, sf_symbols)) {
+          if (srsran_pdsch_encode(&pdsch, &dl_sf, &pdsch_cfg, data, sf_symbols, 42)) {
             ERROR("Error encoding PDSCH");
             exit(-1);
           }

@@ -114,7 +114,7 @@ int main(int argc, char** argv)
     bch_payload_tx[i] = (uint8_t)srsran_random_uniform_int_dist(random_gen, 0, 1);
   }
 
-  srsran_pbch_encode(&pbch, bch_payload_tx, sf_symbols, 0);
+  srsran_pbch_encode(&pbch, bch_payload_tx, sf_symbols, 0, 42);
 
   /* combine outputs */
   for (i = 1; i < cell.nof_ports; i++) {
