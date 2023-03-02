@@ -219,7 +219,7 @@ void cc_worker::work_ul(const srsran_ul_sf_cfg_t& ul_sf_cfg, stack_interface_phy
 {
   // Frederik
   printf("work_ul called\n");
-  printf("Number of UL SF symbols: %d\n", sizeof(*enb_ul.sf_symbols));
+  printf("Number of UL SF symbols: %ld\n", sizeof(*enb_ul.sf_symbols));
   //
 
   std::lock_guard<std::mutex> lock(mutex);
