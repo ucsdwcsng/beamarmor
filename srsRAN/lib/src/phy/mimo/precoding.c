@@ -1970,7 +1970,7 @@ int srsran_precoding_diversity(cf_t* x[SRSRAN_MAX_LAYERS],
   // Frederik
   int p1 = 1;
   double theta_beam_rad;
-  printf("srsenb: Using theta_null: %d°\n", theta_null);
+  // printf("srsenb: Using theta_null: %d°\n", theta_null);
   // Calculate theta_beam_rad from theta_null
   if (sin(theta_null*M_PI/180) > 0) {
     theta_beam_rad = asin(sin(theta_null*M_PI/180)-1);
