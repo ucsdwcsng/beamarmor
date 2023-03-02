@@ -91,7 +91,7 @@ private:
   srsran_enb_ul_t enb_ul = {};
 
   srsran_dl_sf_cfg_t dl_sf = {};
-  srsran_ul_sf_cfg_t ul_sf = {};srsran_enb_ul_fft
+  srsran_ul_sf_cfg_t ul_sf = {};
 
   srsran_softbuffer_tx_t temp_mbsfn_softbuffer = {};
 
