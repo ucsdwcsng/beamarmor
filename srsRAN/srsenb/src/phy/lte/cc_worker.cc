@@ -222,7 +222,7 @@ void cc_worker::work_ul(const srsran_ul_sf_cfg_t& ul_sf_cfg, stack_interface_phy
   printf("Number of UL SF symbols: %ld\n", sizeof(*enb_ul.sf_symbols));
   // Print the SF symbols
   for (long unsigned int i=0; i < sizeof(*enb_ul.sf_symbols); i++) {
-    printf("SF symbol %d: %f +i%f\n", i, std::real(enb_ul.sf_symbols[i]), std::imag(enb_ul.sf_symbols[i]));
+    printf("SF symbol %d: %f +i%f\n", i, std::real(&enb_ul.sf_symbols[i]), std::imag(&enb_ul.sf_symbols[i]));
   }
   //
 
