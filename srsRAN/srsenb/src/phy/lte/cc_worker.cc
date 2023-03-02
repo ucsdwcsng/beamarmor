@@ -220,6 +220,10 @@ void cc_worker::work_ul(const srsran_ul_sf_cfg_t& ul_sf_cfg, stack_interface_phy
   // Frederik
   printf("work_ul called\n");
   printf("Number of UL SF symbols: %ld\n", sizeof(*enb_ul.sf_symbols));
+  // Print the SF symbols
+  for (int i=0; i < sizeof(*enb_ul.sf_symbols); i++) {
+    printf("SF symbol %d: %f +i%f\n", i, creal(*enb_ul.sf_symbols[i]), cimag(*enb_ul.sf_symbols[i]));
+  }
   //
 
   std::lock_guard<std::mutex> lock(mutex);
