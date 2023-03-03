@@ -218,12 +218,12 @@ uint32_t cc_worker::get_nof_rnti()
 void cc_worker::work_ul(const srsran_ul_sf_cfg_t& ul_sf_cfg, stack_interface_phy_lte::ul_sched_t& ul_grants)
 {
   // Frederik
-  printf("work_ul called\n");
-  printf("Number of UL SF symbols: %ld\n", sizeof(*enb_ul.sf_symbols));
-  // Print the SF symbols
-  for (long unsigned int i=0; i < sizeof(*enb_ul.sf_symbols); i++) {
-    printf("SF symbol %d: %lf +i%lf\n", i, std::real(*enb_ul.sf_symbols[i]), std::imag(*enb_ul.sf_symbols[i]));
-  }
+  // printf("work_ul called\n");
+  // printf("Number of UL SF symbols: %ld\n", sizeof(*enb_ul.sf_symbols));
+  // // Print the SF symbols
+  // for (long unsigned int i=0; i < sizeof(*enb_ul.sf_symbols); i++) {
+  //   printf("SF symbol %d: %f +i%f\n", i, __real__ *enb_ul.sf_symbols[i], __imag__ *enb_ul.sf_symbols[i]);
+  // }
   //
 
   std::lock_guard<std::mutex> lock(mutex);

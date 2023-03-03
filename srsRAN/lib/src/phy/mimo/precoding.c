@@ -369,6 +369,9 @@ int srsran_predecoding_single(cf_t*  y_,
 {
   // Frederik
   printf("srsran_predecoding_single\n");
+  printf("Number of symbols: %d\n", nof_symbols);
+  printf("Size of y_: %ld\n", sizeof(y_));
+  printf("----------------------------------");
   //
   cf_t* y[SRSRAN_MAX_PORTS];
   cf_t* h[SRSRAN_MAX_PORTS];
@@ -662,7 +665,7 @@ int srsran_predecoding_diversity(cf_t* y_,
                                  float scaling)
 {
   // Frederik
-  printf("srsran_predecoding_diversity\n");
+  // printf("srsran_predecoding_diversity\n");
   //
   cf_t*    h[SRSRAN_MAX_PORTS][SRSRAN_MAX_PORTS];
   cf_t*    y[SRSRAN_MAX_PORTS];
@@ -801,7 +804,7 @@ int srsran_predecoding_diversity_multi(cf_t*  y[SRSRAN_MAX_PORTS],
                                        float  scaling)
 {
   // Frederik
-  printf("srsran_predecoding_diversity_multi\n");
+  // printf("srsran_predecoding_diversity_multi\n");
   //
   if (csi && csi[0]) {
     return srsran_predecoding_diversity_csi(y, h, x, csi, nof_rxant, nof_ports, nof_symbols, scaling);
@@ -1894,7 +1897,7 @@ int srsran_predecoding_type(cf_t*              y[SRSRAN_MAX_PORTS],
                             float              noise_estimate)
 {
   // Frederik
-  printf("srsran_predecoding_type\n");
+  // printf("srsran_predecoding_type\n");
   //
   if (nof_ports > SRSRAN_MAX_PORTS) {
     ERROR("Maximum number of ports is %d (nof_ports=%d)", SRSRAN_MAX_PORTS, nof_ports);
