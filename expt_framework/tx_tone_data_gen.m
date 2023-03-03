@@ -7,7 +7,7 @@
 
 tone_freq = 1e6; % Tone frequency
 samples_per_phase = 1e4;
-N_angles=180;
+N_angles=360;
 N_samples = N_angles*samples_per_phase; %Num samples to transmit
 fs = 10e6; % Sampling rate
 Ts = 1/fs; % Sampling time

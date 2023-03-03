@@ -348,6 +348,7 @@ int srsran_predecoding_single_csi(cf_t*  y[SRSRAN_MAX_PORTS],
     cf_t  r    = 0;
     float hh   = 0;
     float norm = 1.0f / scaling;
+    // Frederik
     for (int p = 0; p < nof_rxant; p++) {
       r += y[p][i] * conjf(h[p][i]);
       hh += (__real__ h[p][i] * __real__ h[p][i]) + (__imag__ h[p][i] * __imag__ h[p][i]);
