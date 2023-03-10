@@ -371,7 +371,7 @@ int srsran_predecoding_single(cf_t*  y_,
   // Frederik
   printf("srsran_predecoding_single\n");
   printf("Number of symbols: %d\n", nof_symbols);
-  printf("Size of y_: %ld\n", sizeof(y_));
+  printf("Size of *y_: %ld\n", sizeof(*y_)/sizeof(cf_t));
   printf("----------------------------------\n");
   //
   cf_t* y[SRSRAN_MAX_PORTS];

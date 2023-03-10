@@ -28,6 +28,10 @@
 #include <uhd/types/sensors.h>
 #include <uhd/usrp/multi_usrp.hpp>
 
+// Frederik
+#include <complex.h>
+//
+
 #include "rf_helper.h"
 #include "rf_plugin.h"
 #include "srsran/phy/utils/debug.h"
@@ -608,6 +612,9 @@ int rf_uhd_open(char* args, void** h)
 
 static int uhd_init(rf_uhd_handler_t* handler, char* args, uint32_t nof_channels)
 {
+  // Frederik
+  printf("uhd_init nof_channels: %d\n", nof_channels);
+  //  
   // Disable fast-path (U/L/O) messages
   setenv("UHD_LOG_FASTPATH_DISABLE", "1", 0);
 
@@ -1299,7 +1306,9 @@ int rf_uhd_recv_with_time_multi(void*    h,
       return SRSRAN_ERROR;
     }
   }
-
+  // Frederik
+  // printf("[rf_uhd_recv_with_time_multi] nof_rx_channels: %d\n", handler->nof_rx_channels);
+  //
   // Receive stream in multiple blocks
   while (rxd_samples_total < nsamples and trials < RF_UHD_IMP_MAX_RX_TRIALS) {
     void* buffs_ptr[SRSRAN_MAX_CHANNELS] = {};
@@ -1310,17 +1319,43 @@ int rf_uhd_recv_with_time_multi(void*    h,
     for (uint32_t i = 0; i < handler->nof_rx_channels; i++) {
       if (data[i] != nullptr) {
         cf_t* data_c = (cf_t*)data[i];
+        // Frederik
+        // std::cout << "data_c = " << *data_c << '\n';
+        //
         buffs_ptr[i] = &data_c[rxd_samples_total];
       } else {
+        // Frederik
+        // printf("else\n");
+        //
         buffs_ptr[i]   = dummy_mem.data();
         num_rx_samples = SRSRAN_MIN(num_rx_samples, (uint32_t)dummy_mem.size());
       }
     }
+    // Frederik
+    // printf("BEFORE handler->uhd->receive\n");
+    // std::cout << "buffs_ptr[0]: " << *(std::complex<double>*)buffs_ptr[0] << '\n';
+    // std::cout << "rxd_samples: " << rxd_samples << '\n';
+    // std::cout << "buffs_ptr[0] = " << std::real(*(cf_t*)buffs_ptr[0]) << "+ i" << std::imag(*(cf_t*)buffs_ptr[0]) << '\n';
+    // std::cout << "buffs_ptr[1] = " << (cf_t*)buffs_ptr[1] << '\n';
+    // printf("buffs_ptr[0]: %f +i%f\n", std::real(buffs_ptr[0]), std::imag(buffs_ptr[0]));
+    // printf("buffs_ptr[1]: %f +i%f\n", std::real(buffs_ptr[1]), std::imag(buffs_ptr[1]));
+    //
+    
 
     if (handler->uhd->receive(buffs_ptr, num_rx_samples, md, 1.0, false, rxd_samples) != UHD_ERROR_NONE) {
       log_rx_error(handler);
       return SRSRAN_ERROR;
     }
+    // Frederik
+    // printf("AFTER handler->uhd->receive\n");
+    // std::cout << "buffs_ptr[0]: " << *(std::complex<double>*)buffs_ptr[0] << '\n';
+    // std::cout << "rxd_samples: " << rxd_samples << '\n';
+    // std::cout << "--------------------------------------------------" << '\n';
+    // std::cout << "buffs_ptr[0] = " << *(cf_t*)buffs_ptr[0] << '\n';
+    // std::cout << "buffs_ptr[1] = " << *(cf_t*)buffs_ptr[1] << '\n';
+    // printf("buffs_ptr[0]: %f +i%f\n", std::real(buffs_ptr[0]), std::imag(buffs_ptr[0]));
+    // printf("buffs_ptr[1]: %f +i%f\n", std::real(buffs_ptr[1]), std::imag(buffs_ptr[1]));
+    //
 
     // Save timespec for first block
     if (rxd_samples_total == 0) {

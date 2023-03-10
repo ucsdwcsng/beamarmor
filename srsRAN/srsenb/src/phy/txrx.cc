@@ -20,6 +20,9 @@
  */
 
 #include <unistd.h>
+// Frederik
+#include <complex.h>
+//
 
 #include "srsenb/hdr/phy/txrx.h"
 #include "srsran/common/band_helper.h"
@@ -91,6 +94,10 @@ void txrx::run_thread()
   srsran::rf_buffer_t    buffer    = {};
   srsran::rf_timestamp_t timestamp = {};
   uint32_t               sf_len    = SRSRAN_SF_LEN_PRB(worker_com->get_nof_prb(0));
+  // Frederik
+  std::cout << "sf_len: " << sf_len << '\n';
+  std::cout << "worker_com->get_nof_rf_channels: " << worker_com->get_nof_rf_channels() << '\n';
+  //
 
   float samp_rate = srsran_sampling_freq_hz(worker_com->get_nof_prb(0));
 
@@ -165,9 +172,22 @@ void txrx::run_thread()
       uint32_t cc = 0;
       for (uint32_t cc_lte = 0; cc_lte < worker_com->get_nof_carriers_lte(); cc_lte++, cc++) {
         uint32_t rf_port = worker_com->get_rf_port(cc);
+        // Frederik
+        // std::cout << "----------------------------------------" << '\n';
+        // std::cout << "rf_port: " << rf_port << '\n';
+        // std::cout << "Nof carriers lte: " << worker_com->get_nof_carriers_lte() << '\n';
+        // std::cout << "No of ports for " << cc << " : " << worker_com->get_nof_ports(cc) << '\n';
+        //
 
         for (uint32_t p = 0; p < worker_com->get_nof_ports(cc); p++) {
           // WARNING: The number of ports for all cells must be the same
+          // Frederik
+          // std::cout << "cc_lte: " << cc_lte << '\n';
+          // std::cout << "rf_port: " << rf_port << '\n';
+          // std::cout << "port p: " << p << '\n';
+          // std::cout << "Size of get_buffer_rx return object: " << sizeof(*lte_worker->get_buffer_rx(cc_lte, p))/sizeof(cf_t) << '\n';
+          // std::cout << "-------------------------------------" << '\n';
+          //
           buffer.set(rf_port, p, worker_com->get_nof_ports(0), lte_worker->get_buffer_rx(cc_lte, p));
         }
       }
@@ -187,6 +207,10 @@ void txrx::run_thread()
 
     buffer.set_nof_samples(sf_len);
     radio_h->rx_now(buffer, timestamp);
+
+    // Frederik
+    // std::cout << "sample_buffer: " << (std::complex<double>)buffer.get(1)[100] << '\n';
+    //
 
     if (ul_channel) {
       ul_channel->run(buffer.to_cf_t(), buffer.to_cf_t(), sf_len, timestamp.get(0));

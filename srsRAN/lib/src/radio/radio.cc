@@ -27,6 +27,9 @@
 #include <list>
 #include <string>
 #include <unistd.h>
+// Frederik
+#include <iostream>
+//
 
 namespace srsran {
 
@@ -1122,7 +1125,11 @@ bool radio::map_channels(const channel_mapping&     map,
         if (ptr != nullptr) {
           ptr += sample_offset;
         }
-
+        // Frederik
+        // std::cout << "physical_idx.device_idx: " << physical_idx.device_idx << '\n';
+        // std::cout << "physical_idx.channel_idx: " << physical_idx.channel_idx << '\n';
+        // std::cout << "---------------------" << '\n';
+        //
         radio_buffers[physical_idx.channel_idx] = ptr;
       }
     }

@@ -97,7 +97,11 @@ void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
   uint32_t         nof_prb    = phy_->get_nof_prb(cc_idx);
   uint32_t         sf_len     = SRSRAN_SF_LEN_PRB(nof_prb);
   srsran_cfr_cfg_t cfr_config = phy_->get_cfr_config();
-
+  // Frederik
+  std::cout << "cc_worker::init called" << '\n';
+  std::cout << "cc_idx: " << cc_idx << '\n';
+  std::cout << "phy->get_nof_ports(cc_idx): " << phy->get_nof_ports(cc_idx) << '\n';
+  //
   // Init cell here
   for (uint32_t p = 0; p < phy->get_nof_ports(cc_idx); p++) {
     signal_buffer_rx[p] = srsran_vec_cf_malloc(2 * sf_len);

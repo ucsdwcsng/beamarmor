@@ -8,3 +8,5 @@ pwr_measure_all_angles
 pwr_measure_all_angles_45right
 timestamps.txt
 timestamps_45right.txt
+gr_scripts/rx0.iq
+gr_scripts/rx1.iq

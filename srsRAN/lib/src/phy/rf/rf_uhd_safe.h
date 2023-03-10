@@ -24,6 +24,12 @@
 #include <set>
 #include <uhd/utils/log.hpp>
 
+// Frederik
+#include <complex.h>
+#include <math.h>
+#include <stdlib.h>
+//
+
 #ifdef UHD_LOG_INFO
 #define Error(message) UHD_LOG_ERROR("UHD RF", message)
 #define Warning(message) UHD_LOG_WARNING("UHD RF", message)
@@ -149,6 +155,10 @@ public:
   uhd_error         start_rx_stream(double delay)
   {
     Debug("Starting Rx stream");
+    // Frederik
+    printf("Starting Rx stream\n");
+    printf("Number of channels: %ld \n", rx_stream->get_num_channels());
+    //
     uhd::time_spec_t time_spec;
     uhd_error        err = get_time_now(time_spec);
     if (err != UHD_ERROR_NONE) {
