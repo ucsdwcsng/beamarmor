@@ -61,14 +61,22 @@ typedef struct SRSRAN_API {
   srsran_pusch_t    pusch;
   srsran_pucch_t    pucch;
 
+  uint8_t ul_obj_id;
+
 } srsran_enb_ul_t;
 
 /* This function shall be called just after the initial synchronization */
 SRSRAN_API int srsran_enb_ul_init(srsran_enb_ul_t* q, cf_t* in_buffer, uint32_t max_prb);
+SRSRAN_API int srsran_enb_ul2_init(srsran_enb_ul_t* q, cf_t* in_buffer, uint32_t max_prb);
 
 SRSRAN_API void srsran_enb_ul_free(srsran_enb_ul_t* q);
 
 SRSRAN_API int srsran_enb_ul_set_cell(srsran_enb_ul_t*                   q,
+                                      srsran_cell_t                      cell,
+                                      srsran_refsignal_dmrs_pusch_cfg_t* pusch_cfg,
+                                      srsran_refsignal_srs_cfg_t*        srs_cfg);
+
+SRSRAN_API int srsran_enb_ul2_set_cell(srsran_enb_ul_t*                   q,
                                       srsran_cell_t                      cell,
                                       srsran_refsignal_dmrs_pusch_cfg_t* pusch_cfg,
                                       srsran_refsignal_srs_cfg_t*        srs_cfg);

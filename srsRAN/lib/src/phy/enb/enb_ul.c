@@ -76,6 +76,45 @@ clean_exit:
   return ret;
 }
 
+int srsran_enb_ul2_init(srsran_enb_ul_t* q, cf_t* in_buffer, uint32_t max_prb)
+{
+  int ret = SRSRAN_ERROR_INVALID_INPUTS;
+
+  if (q != NULL) {
+    ret = SRSRAN_ERROR;
+
+    bzero(q, sizeof(srsran_enb_ul_t));
+
+    q->sf_symbols = srsran_vec_cf_malloc(SRSRAN_SF_LEN_RE(max_prb, SRSRAN_CP_NORM));
+    if (!q->sf_symbols) {
+      perror("malloc");
+      goto clean_exit;
+    }
+    //
+    // Leave out channel estimation; no memory allocated
+    //
+    q->in_buffer = in_buffer;
+    //
+    // Leave out other channels than PUSCH; no memory allocated
+    //
+    if (srsran_pusch_init_enb(&q->pusch, max_prb)) {
+      ERROR("Error creating PUSCH object");
+      goto clean_exit;
+    }
+
+    ret = SRSRAN_SUCCESS;
+
+  } else {
+    ERROR("Invalid parameters");
+  }
+
+clean_exit:
+  if (ret == SRSRAN_ERROR) {
+    srsran_enb_ul_free(q);
+  }
+  return ret;
+}
+
 void srsran_enb_ul_free(srsran_enb_ul_t* q)
 {
   if (q) {
@@ -139,6 +178,47 @@ int srsran_enb_ul_set_cell(srsran_enb_ul_t*                   q,
 
       // SRS is a dedicated configuration
       srsran_chest_ul_pregen(&q->chest, pusch_cfg, srs_cfg);
+
+      ret = SRSRAN_SUCCESS;
+    }
+  } else {
+    ERROR("Invalid cell properties: Id=%d, Ports=%d, PRBs=%d", cell.id, cell.nof_ports, cell.nof_prb);
+  }
+  return ret;
+}
+
+int srsran_enb_ul2_set_cell(srsran_enb_ul_t*                   q,
+                            srsran_cell_t                      cell,
+                            srsran_refsignal_dmrs_pusch_cfg_t* pusch_cfg,
+                            srsran_refsignal_srs_cfg_t*        srs_cfg)
+{
+  int ret = SRSRAN_ERROR_INVALID_INPUTS;
+
+  if (q != NULL && srsran_cell_isvalid(&cell)) {
+    if (cell.id != q->cell.id || q->cell.nof_prb == 0) {
+      q->cell = cell;
+
+      srsran_ofdm_cfg_t ofdm_cfg2 = {};
+      ofdm_cfg2.nof_prb           = q->cell.nof_prb;
+      ofdm_cfg2.in_buffer         = q->in_buffer;
+      ofdm_cfg2.out_buffer        = q->sf_symbols;
+      ofdm_cfg2.cp                = q->cell.cp;
+      ofdm_cfg2.freq_shift_f      = -0.5f;
+      ofdm_cfg2.normalize         = false;
+      ofdm_cfg2.rx_window_offset  = 0.5f;
+      if (srsran_ofdm_rx_init_cfg(&q->fft, &ofdm_cfg2)) {
+        ERROR("Error initiating FFT UL obj 2");
+        return SRSRAN_ERROR;
+      }
+      if (srsran_ofdm_rx_set_prb(&q->fft, q->cell.cp, q->cell.nof_prb)) {
+        ERROR("Error initiating FFT UL obj 2");
+        return SRSRAN_ERROR;
+      }
+
+      if (srsran_pusch_set_cell(&q->pusch, q->cell)) {
+        ERROR("Error creating PUSCH object for UL obj 2");
+        return SRSRAN_ERROR;
+      }
 
       ret = SRSRAN_SUCCESS;
     }

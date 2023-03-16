@@ -129,8 +129,14 @@ void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
     ERROR("Error setting the CFR");
     return;
   }
+  enb_ul.ul_obj_id = 1;
   if (srsran_enb_ul_init(&enb_ul, signal_buffer_rx[0], nof_prb)) {
     ERROR("Error initiating ENB UL");
+    return;
+  }
+  enb_ul2.ul_obj_id = 2;
+  if (srsran_enb_ul2_init(&enb_ul2, signal_buffer_rx[1], nof_prb)) {
+    ERROR("Error initiating ENB UL 2");
     return;
   }
 
@@ -138,6 +144,10 @@ void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
     ERROR("Error initiating ENB UL");
     return;
   }
+  if (srsran_enb_ul2_set_cell(&enb_ul2, cell, &phy->dmrs_pusch_cfg, nullptr)) {
+    ERROR("Error initiating ENB UL");
+    return;
+  } 
 
   /* Setup SI-RNTI in PHY */
   add_rnti(SRSRAN_SIRNTI);
@@ -162,6 +172,8 @@ void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
   if (phy->params.pusch_8bit_decoder) {
     enb_ul.pusch.llr_is_8bit        = true;
     enb_ul.pusch.ul_sch.llr_is_8bit = true;
+    enb_ul2.pusch.llr_is_8bit = true;
+    enb_ul2.pusch.ul_sch.llr_is_8bit = true;
   }
   initiated = true;
 
@@ -236,6 +248,7 @@ void cc_worker::work_ul(const srsran_ul_sf_cfg_t& ul_sf_cfg, stack_interface_phy
 
   // Process UL signal
   srsran_enb_ul_fft(&enb_ul);
+  srsran_enb_ul_fft(&enb_ul2);
 
   // Decode pending UL grants for the tti they were scheduled
   decode_pusch(ul_grants.pusch, ul_grants.nof_grants);
@@ -319,7 +332,8 @@ void cc_worker::work_dl(const srsran_dl_sf_cfg_t&            dl_sf_cfg,
 
 bool cc_worker::decode_pusch_rnti(stack_interface_phy_lte::ul_sched_grant_t& ul_grant,
                                   srsran_ul_cfg_t&                           ul_cfg,
-                                  srsran_pusch_res_t&                        pusch_res)
+                                  srsran_pusch_res_t&                        pusch_res,
+                                  uint8_t                                    ul_obj_id)
 {
   uint16_t rnti = ul_grant.dci.rnti;
 
@@ -346,9 +360,18 @@ bool cc_worker::decode_pusch_rnti(stack_interface_phy_lte::ul_sched_grant_t& ul_
 
   // Compute UL grant
   srsran_pusch_grant_t& grant = ul_cfg.pusch.grant;
-  if (srsran_ra_ul_dci_to_grant(&enb_ul.cell, &ul_sf, &ul_cfg.hopping, &ul_grant.dci, &grant)) {
-    Error("Computing PUSCH dci for RNTI %x", rnti);
-    return false;
+  // Determine if original UL object (UL object 1) OR UL object 2
+  if (ul_obj_id == 1) {
+    if (srsran_ra_ul_dci_to_grant(&enb_ul.cell, &ul_sf, &ul_cfg.hopping, &ul_grant.dci, &grant)) {
+      Error("Computing PUSCH dci for RNTI %x", rnti);
+      return false;
+    }
+  }
+  else if (ul_obj_id == 2) {
+    if (srsran_ra_ul_dci_to_grant(&enb_ul2.cell, &ul_sf, &ul_cfg.hopping, &ul_grant.dci, &grant)) {
+      Error("Computing PUSCH dci for RNTI %x", rnti);
+      return false;
+    }
   }
 
   // Handle Format0 adaptive retx
@@ -376,16 +399,31 @@ bool cc_worker::decode_pusch_rnti(stack_interface_phy_lte::ul_sched_grant_t& ul_
   ul_cfg.pusch.softbuffers.rx = ul_grant.softbuffer_rx;
   pusch_res.data              = ul_grant.data;
   if (pusch_res.data) {
-    if (srsran_enb_ul_get_pusch(&enb_ul, &ul_sf, &ul_cfg.pusch, &pusch_res)) {
-      Error("Decoding PUSCH for RNTI %x", rnti);
-      return false;
+    // Determine if UL object 1 or 2
+    if (ul_obj_id == 1) {
+      if (srsran_enb_ul_get_pusch(&enb_ul, &ul_sf, &ul_cfg.pusch, &pusch_res)) {
+        Error("Decoding PUSCH for RNTI %x", rnti);
+        return false;
+      }
+    }
+    else if (ul_obj_id == 2) {
+      if (srsran_enb_ul_get_pusch(&enb_ul2, &ul_sf, &ul_cfg.pusch, &pusch_res)) {
+        Error("Decoding PUSCH for RNTI %x", rnti);
+        return false;
+      }
     }
   }
   // Save PHICH scheduling for this user. Each user can have just 1 PUSCH dci per TTI
   ue_db[rnti]->phich_grant.n_prb_lowest = grant.n_prb_tilde[0];
   ue_db[rnti]->phich_grant.n_dmrs       = ul_grant.dci.n_dmrs;
 
-  float snr_db = enb_ul.chest_res.snr_db;
+  // Determine if UL object 1 or 2
+  if (ul_obj_id == 1) {
+    float snr_db = enb_ul.chest_res.snr_db;
+  }
+  else if (ul_obj_id == 2) {
+    float snr_db = enb_ul2.chest_res.snr_db;
+  }
 
   // Notify MAC of RL status
   if (snr_db >= PUSCH_RL_SNR_DB_TH) {
@@ -393,8 +431,16 @@ bool cc_worker::decode_pusch_rnti(stack_interface_phy_lte::ul_sched_grant_t& ul_
     phy->stack->snr_info(ul_sf.tti, rnti, cc_idx, snr_db, mac_interface_phy_lte::PUSCH);
 
     // Notify MAC of Time Alignment only if it enabled and valid measurement, ignore value otherwise
-    if (ul_cfg.pusch.meas_ta_en and not std::isnan(enb_ul.chest_res.ta_us) and not std::isinf(enb_ul.chest_res.ta_us)) {
-      phy->stack->ta_info(ul_sf.tti, rnti, enb_ul.chest_res.ta_us);
+    // Determine if UL object 1 or 2
+    if (ul_obj_id == 1) {
+      if (ul_cfg.pusch.meas_ta_en and not std::isnan(enb_ul.chest_res.ta_us) and not std::isinf(enb_ul.chest_res.ta_us)) {
+        phy->stack->ta_info(ul_sf.tti, rnti, enb_ul.chest_res.ta_us);
+      }
+    }
+    else if (ul_obj_id == 2) {
+      if (ul_cfg.pusch.meas_ta_en and not std::isnan(enb_ul2.chest_res.ta_us) and not std::isinf(enb_ul2.chest_res.ta_us)) {
+        phy->stack->ta_info(ul_sf.tti, rnti, enb_ul2.chest_res.ta_us);
+      }
     }
   }
 
@@ -406,10 +452,20 @@ bool cc_worker::decode_pusch_rnti(stack_interface_phy_lte::ul_sched_grant_t& ul_
   // Save statistics only if data was provided
   if (ul_grant.data != nullptr) {
     // Save metrics stats
-    ue_db[rnti]->metrics_ul(ul_grant.dci.tb.mcs_idx,
-                            enb_ul.chest_res.epre_dBfs - phy->params.rx_gain_offset,
-                            enb_ul.chest_res.snr_db,
-                            pusch_res.avg_iterations_block);
+    // Determine if UL object 1 or 2
+    if (ul_obj_id == 1) {
+      ue_db[rnti]->metrics_ul(ul_grant.dci.tb.mcs_idx,
+                              enb_ul.chest_res.epre_dBfs - phy->params.rx_gain_offset,
+                              enb_ul.chest_res.snr_db,
+                              pusch_res.avg_iterations_block);
+      }
+    else if (ul_obj_id == 2) {
+      ue_db[rnti]->metrics_ul(ul_grant.dci.tb.mcs_idx,
+                              enb_ul2.chest_res.epre_dBfs - phy->params.rx_gain_offset,
+                              enb_ul2.chest_res.snr_db,
+                              pusch_res.avg_iterations_block);
+      }
+    }
   }
   return true;
 }
@@ -421,14 +477,24 @@ void cc_worker::decode_pusch(stack_interface_phy_lte::ul_sched_grant_t* grants, 
     // Get grant itself and RNTI
     stack_interface_phy_lte::ul_sched_grant_t& ul_grant = grants[i];
     uint16_t                                   rnti     = ul_grant.dci.rnti;
+    
+    stack_interface_phy_lte::ul_sched_grant_t& ul_grant_ul2 = grants[i];
+    uint16_t                                   rnti_ul2     = ul_grant.dci.rnti;
 
     srsran_pusch_res_t pusch_res = {};
     srsran_ul_cfg_t    ul_cfg    = {};
 
+    srsran_pusch_res_t pusch_res_ul2 = {};
+    srsran_ul_cfg_t    ul_cfg_ul2    = {};    
+
     // Decodes PUSCH for the given grant
-    if (!decode_pusch_rnti(ul_grant, ul_cfg, pusch_res)) {
+    if (!decode_pusch_rnti(ul_grant, ul_cfg, pusch_res, enb_ul.ul_obj_id)) {
       return;
     }
+    // Decodes PUSCH for the given grant for UL object 2
+    if (!decode_pusch_rnti(ul_grant_ul2, ul_cfg_ul2, pusch_res_ul2, enb_ul2.ul_obj_id)) {
+      return;
+    }    
 
     // Notify MAC new received data and HARQ Indication value
     if (ul_grant.data != nullptr) {

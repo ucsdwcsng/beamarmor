@@ -71,7 +71,8 @@ private:
   int  encode_pmch(stack_interface_phy_lte::dl_sched_grant_t* grant, srsran_mbsfn_cfg_t* mbsfn_cfg);
   bool decode_pusch_rnti(stack_interface_phy_lte::ul_sched_grant_t& ul_grant,
                          srsran_ul_cfg_t&                           ul_cfg,
-                         srsran_pusch_res_t&                        pusch_res);
+                         srsran_pusch_res_t&                        pusch_res,
+                         uint8_t                                    ul_obj_id);
   void decode_pusch(stack_interface_phy_lte::ul_sched_grant_t* grants, uint32_t nof_pusch);
   int  encode_phich(stack_interface_phy_lte::ul_sched_ack_t* acks, uint32_t nof_acks, int theta_null);
   int  encode_pdcch_dl(stack_interface_phy_lte::dl_sched_grant_t* grants, uint32_t nof_grants, int theta_null);
@@ -89,6 +90,7 @@ private:
 
   srsran_enb_dl_t enb_dl = {};
   srsran_enb_ul_t enb_ul = {};
+  srsran_enb_ul_t enb_ul2 = {};
 
   srsran_dl_sf_cfg_t dl_sf = {};
   srsran_ul_sf_cfg_t ul_sf = {};
