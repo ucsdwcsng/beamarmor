@@ -418,11 +418,12 @@ bool cc_worker::decode_pusch_rnti(stack_interface_phy_lte::ul_sched_grant_t& ul_
   ue_db[rnti]->phich_grant.n_dmrs       = ul_grant.dci.n_dmrs;
 
   // Determine if UL object 1 or 2
+  float snr_db = 0.0;
   if (ul_obj_id == 1) {
-    float snr_db = enb_ul.chest_res.snr_db;
+    snr_db = enb_ul.chest_res.snr_db;
   }
   else if (ul_obj_id == 2) {
-    float snr_db = enb_ul2.chest_res.snr_db;
+    snr_db = enb_ul2.chest_res.snr_db;
   }
 
   // Notify MAC of RL status
@@ -458,13 +459,12 @@ bool cc_worker::decode_pusch_rnti(stack_interface_phy_lte::ul_sched_grant_t& ul_
                               enb_ul.chest_res.epre_dBfs - phy->params.rx_gain_offset,
                               enb_ul.chest_res.snr_db,
                               pusch_res.avg_iterations_block);
-      }
+    }
     else if (ul_obj_id == 2) {
       ue_db[rnti]->metrics_ul(ul_grant.dci.tb.mcs_idx,
                               enb_ul2.chest_res.epre_dBfs - phy->params.rx_gain_offset,
                               enb_ul2.chest_res.snr_db,
                               pusch_res.avg_iterations_block);
-      }
     }
   }
   return true;
