@@ -90,15 +90,23 @@ int srsran_enb_ul2_init(srsran_enb_ul_t* q, cf_t* in_buffer, uint32_t max_prb)
       perror("malloc");
       goto clean_exit;
     }
-    //
-    // Leave out channel estimation; no memory allocated
-    //
+    q->chest_res.ce = srsran_vec_cf_malloc(SRSRAN_SF_LEN_RE(max_prb, SRSRAN_CP_NORM));
+    if (!q->chest_res.ce) {
+      perror("malloc");
+      goto clean_exit;
+    }
+
     q->in_buffer = in_buffer;
     //
     // Leave out other channels than PUSCH; no memory allocated
     //
     if (srsran_pusch_init_enb(&q->pusch, max_prb)) {
-      ERROR("Error creating PUSCH object");
+      ERROR("Error creating PUSCH object UL 2");
+      goto clean_exit;
+    }
+    // Channel estimates are needed for PUSCH decoding
+    if (srsran_chest_ul_init(&q->chest, max_prb)) {
+      ERROR("Error initiating channel estimator UL 2");
       goto clean_exit;
     }
 
@@ -214,11 +222,19 @@ int srsran_enb_ul2_set_cell(srsran_enb_ul_t*                   q,
         ERROR("Error initiating FFT UL obj 2");
         return SRSRAN_ERROR;
       }
+      
+      // Leave out PUCCH
 
       if (srsran_pusch_set_cell(&q->pusch, q->cell)) {
         ERROR("Error creating PUSCH object for UL obj 2");
         return SRSRAN_ERROR;
       }
+      if (srsran_chest_ul_set_cell(&q->chest, cell)) {
+        ERROR("Error initiating channel estimator");
+        return SRSRAN_ERROR;
+      }
+      // SRS is a dedicated configuration
+      srsran_chest_ul_pregen(&q->chest, pusch_cfg, srs_cfg);
 
       ret = SRSRAN_SUCCESS;
     }

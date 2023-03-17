@@ -488,13 +488,15 @@ void cc_worker::decode_pusch(stack_interface_phy_lte::ul_sched_grant_t* grants, 
     srsran_ul_cfg_t    ul_cfg_ul2    = {};    
 
     // Decodes PUSCH for the given grant
+    // UL object 1 and 2: Do 2nd UL object first because it does not inlcude channel estimates which causes
+    // decoding results to be inaccurate. Do 1st UL object (original; created by srsRAN developers) second, so
+    // correctly decoded data makes its way up the stack.
+    if (!decode_pusch_rnti(ul_grant_ul2, ul_cfg_ul2, pusch_res_ul2, enb_ul2.ul_obj_id)) {
+      return;
+    }
     if (!decode_pusch_rnti(ul_grant, ul_cfg, pusch_res, enb_ul.ul_obj_id)) {
       return;
     }
-    // Decodes PUSCH for the given grant for UL object 2
-    if (!decode_pusch_rnti(ul_grant_ul2, ul_cfg_ul2, pusch_res_ul2, enb_ul2.ul_obj_id)) {
-      return;
-    }    
 
     // Notify MAC new received data and HARQ Indication value
     if (ul_grant.data != nullptr) {
