@@ -28,6 +28,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#define MAX_PUSCH_RE(cp) (2 * SRSRAN_CP_NSYMB(cp) * 12)
+
 #include "srsran/srsran.h"
 
 static srsran_cell_t cell = {
@@ -329,7 +331,10 @@ int main(int argc, char** argv)
     memcpy(&cfg.uci_cfg, &uci_data_tx.cfg, sizeof(srsran_uci_cfg_t));
 
     gettimeofday(&t[1], NULL);
-    int r = srsran_pusch_decode(&pusch_rx, &ul_sf, &cfg, &chest_res, sf_symbols, &pusch_res);
+    // Frederik
+    cf_t* dummy_buffer;
+    dummy_buffer = srsran_vec_cf_malloc(SRSRAN_MAX_PRB * MAX_PUSCH_RE(SRSRAN_CP_NORM));
+    int r = srsran_pusch_decode(&pusch_rx, &ul_sf, &cfg, &chest_res, sf_symbols, &pusch_res, dummy_buffer);
     gettimeofday(&t[2], NULL);
     if (r) {
       printf("Error returned while decoding\n");

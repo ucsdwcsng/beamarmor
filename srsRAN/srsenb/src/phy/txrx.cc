@@ -258,6 +258,12 @@ void txrx::run_thread()
       // Start LTE worker processing
       worker_com->semaphore.push(lte_worker);
       lte_workers->start_worker(lte_worker);
+
+      // Frederik
+      // Calculate alpha for null-steering
+      cf_t* y1 = lte_worker->get_symbols_after_predecoding(0, 0);
+      cf_t* y2 = lte_worker->get_symbols_after_predecoding(0, 1);
+      
     }
 
     // Advance in time

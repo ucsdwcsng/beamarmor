@@ -110,6 +110,11 @@ cf_t* sf_worker::get_buffer_rx(uint32_t cc_idx, uint32_t antenna_idx)
   return cc_workers[cc_idx]->get_buffer_rx(antenna_idx);
 }
 
+cf_t* sf_worker::get_symbols_after_predecoding(uint32_t cc_idx, uint32_t rx_stream_idx)
+{
+  return cc_workers[cc_idx]->get_symbols_after_predecoding(rx_stream_idx);
+}
+
 void sf_worker::set_context(const srsran::phy_common_interface::worker_context_t& w_ctx)
 {
   tti_rx    = w_ctx.sf_idx;

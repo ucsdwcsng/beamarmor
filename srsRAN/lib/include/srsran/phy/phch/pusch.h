@@ -117,7 +117,8 @@ SRSRAN_API int srsran_pusch_decode(srsran_pusch_t*        q,
                                    srsran_pusch_cfg_t*    cfg,
                                    srsran_chest_ul_res_t* channel,
                                    cf_t*                  sf_symbols,
-                                   srsran_pusch_res_t*    data);
+                                   srsran_pusch_res_t*    data,
+                                   cf_t* symbols_after_predecoding_);
 
 SRSRAN_API uint32_t srsran_pusch_grant_tx_info(srsran_pusch_grant_t* grant,
                                                srsran_uci_cfg_t*     uci_cfg,

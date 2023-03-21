@@ -43,6 +43,8 @@ public:
   cf_t* get_buffer_rx(uint32_t cc_idx, uint32_t antenna_idx);
   void  set_context(const srsran::phy_common_interface::worker_context_t& w_ctx);
 
+  cf_t* get_symbols_after_predecoding(uint32_t cc_idx, uint32_t rx_stream_idx);
+
   int      add_rnti(uint16_t rnti, uint32_t cc_idx);
   void     rem_rnti(uint16_t rnti);
   uint32_t get_nof_rnti();

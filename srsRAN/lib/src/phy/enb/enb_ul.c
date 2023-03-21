@@ -371,9 +371,10 @@ int srsran_enb_ul_get_pucch(srsran_enb_ul_t*    q,
 int srsran_enb_ul_get_pusch(srsran_enb_ul_t*    q,
                             srsran_ul_sf_cfg_t* ul_sf,
                             srsran_pusch_cfg_t* cfg,
-                            srsran_pusch_res_t* res)
+                            srsran_pusch_res_t* res,
+                            cf_t* symbols_after_predecoding_)
 {
   srsran_chest_ul_estimate_pusch(&q->chest, ul_sf, cfg, q->sf_symbols, &q->chest_res);
 
-  return srsran_pusch_decode(&q->pusch, ul_sf, cfg, &q->chest_res, q->sf_symbols, res);
+  return srsran_pusch_decode(&q->pusch, ul_sf, cfg, &q->chest_res, q->sf_symbols, res, symbols_after_predecoding_);
 }

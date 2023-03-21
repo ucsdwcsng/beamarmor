@@ -22,6 +22,7 @@
 #include <iomanip>
 // Frederik
 #include <fstream>
+#define MAX_PUSCH_RE(cp) (2 * SRSRAN_CP_NSYMB(cp) * 12)
 //
 
 #include "srsran/common/threads.h"
@@ -116,6 +117,13 @@ void cc_worker::init(phy_common* phy_, uint32_t cc_idx_)
       return;
     }
     srsran_vec_cf_zero(signal_buffer_tx[p], 2 * sf_len);
+    // Buffer for estimation of alpha from y1 and y2 (rx streams 1 and 2)
+    symbols_after_predecoding[p] = srsran_vec_cf_malloc(nof_prb * MAX_PUSCH_RE(SRSRAN_CP_NORM));
+    if (!symbols_after_predecoding[p]) {
+      ERROR("Error allocating memory");
+      return;
+    }
+    srsran_vec_cf_zero(symbols_after_predecoding[p], nof_prb * MAX_PUSCH_RE(SRSRAN_CP_NORM));
   }
   if (srsran_enb_dl_init(&enb_dl, signal_buffer_tx, nof_prb)) {
     ERROR("Error initiating ENB DL (cc=%d)", cc_idx);
@@ -203,6 +211,11 @@ void cc_worker::set_tti(uint32_t tti_)
   tti_rx    = tti_;
   tti_tx_dl = TTI_ADD(tti_rx, FDD_HARQ_DELAY_UL_MS);
   tti_tx_ul = TTI_RX_ACK(tti_rx);
+}
+
+cf_t* cc_worker::get_symbols_after_predecoding(uint32_t rx_stream_idx)
+{
+  return symbols_after_predecoding[rx_stream_idx];
 }
 
 int cc_worker::add_rnti(uint16_t rnti)
@@ -401,13 +414,13 @@ bool cc_worker::decode_pusch_rnti(stack_interface_phy_lte::ul_sched_grant_t& ul_
   if (pusch_res.data) {
     // Determine if UL object 1 or 2
     if (ul_obj_id == 1) {
-      if (srsran_enb_ul_get_pusch(&enb_ul, &ul_sf, &ul_cfg.pusch, &pusch_res)) {
+      if (srsran_enb_ul_get_pusch(&enb_ul, &ul_sf, &ul_cfg.pusch, &pusch_res, symbols_after_predecoding[0])) {
         Error("Decoding PUSCH for RNTI %x", rnti);
         return false;
       }
     }
     else if (ul_obj_id == 2) {
-      if (srsran_enb_ul_get_pusch(&enb_ul2, &ul_sf, &ul_cfg.pusch, &pusch_res)) {
+      if (srsran_enb_ul_get_pusch(&enb_ul2, &ul_sf, &ul_cfg.pusch, &pusch_res, symbols_after_predecoding[1])) {
         Error("Decoding PUSCH for RNTI %x", rnti);
         return false;
       }

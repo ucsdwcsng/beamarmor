@@ -44,6 +44,8 @@ public:
   cf_t* get_buffer_tx(uint32_t antenna_idx);
   void  set_tti(uint32_t tti);
 
+  cf_t* get_symbols_after_predecoding(uint32_t rx_stream_idx);
+
   int      add_rnti(uint16_t rnti);
   void     rem_rnti(uint16_t rnti);
   uint32_t get_nof_rnti();
@@ -91,6 +93,8 @@ private:
   srsran_enb_dl_t enb_dl = {};
   srsran_enb_ul_t enb_ul = {};
   srsran_enb_ul_t enb_ul2 = {};
+
+  cf_t* symbols_after_predecoding[SRSRAN_MAX_PORTS] = {};
 
   srsran_dl_sf_cfg_t dl_sf = {};
   srsran_ul_sf_cfg_t ul_sf = {};

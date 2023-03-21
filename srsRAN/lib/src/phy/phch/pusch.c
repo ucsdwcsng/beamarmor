@@ -360,7 +360,8 @@ int srsran_pusch_decode(srsran_pusch_t*        q,
                         srsran_pusch_cfg_t*    cfg,
                         srsran_chest_ul_res_t* channel,
                         cf_t*                  sf_symbols,
-                        srsran_pusch_res_t*    out)
+                        srsran_pusch_res_t*    out,
+                        cf_t* symbols_after_predecoding_)
 {
   int      ret = SRSRAN_ERROR_INVALID_INPUTS;
   uint32_t n;
@@ -411,6 +412,10 @@ int srsran_pusch_decode(srsran_pusch_t*        q,
 
     // Equalization
     srsran_predecoding_single(q->d, q->ce, q->z, NULL, cfg->grant.nof_re, 1.0f, channel->noise_estimate);
+    // Save predecoded symbols (y1 and y2) here:
+    srsran_vec_cf_copy(symbols_after_predecoding_, q->z, cfg->grant.nof_re);
+
+    printf("[srsran_pusch_decode] max_re: %d\n", q->max_re);
 
     // DFT predecoding
     srsran_dft_precoding(&q->dft_precoding, q->z, q->d, cfg->grant.L_prb, cfg->grant.nof_symb);
