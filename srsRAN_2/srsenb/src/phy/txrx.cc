@@ -21,6 +21,9 @@
 
 #include <unistd.h>
 
+#include <fstream>
+
+
 #include "srsenb/hdr/phy/txrx.h"
 #include "srsran/common/band_helper.h"
 #include "srsran/common/threads.h"
@@ -95,6 +98,8 @@ void txrx::run_thread()
   float samp_rate = srsran_sampling_freq_hz(worker_com->get_nof_prb(0));
 
   srsran::srsran_band_helper band_helper;
+
+  ofstream y1_file, y2_file;
 
   // Configure radio
   radio_h->set_rx_srate(samp_rate);
@@ -187,6 +192,19 @@ void txrx::run_thread()
 
     buffer.set_nof_samples(sf_len);
     radio_h->rx_now(buffer, timestamp);
+
+    // Get raw y1 and y2
+    // std::cout << "Get raw y1 and y2" << '\n';
+    cf_t* y1 = buffer.get(0);
+    cf_t* y2 = buffer.get(1);
+    y1_file.open("../../y1.txt");
+    y2_file.open("../../y2.txt");
+    for (uint32_t i = 0; i < sf_len; i++) {
+      y1_file << (std::complex<double>)y1[i] << ',';
+      y2_file << (std::complex<double>)y2[i] << ',';
+    }
+    y1_file.close();
+    y2_file.close();
 
     if (ul_channel) {
       ul_channel->run(buffer.to_cf_t(), buffer.to_cf_t(), sf_len, timestamp.get(0));
