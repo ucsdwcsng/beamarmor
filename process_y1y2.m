@@ -10,6 +10,8 @@ y2 = regexprep(C2,')','');
 y2 = regexprep(y2,'(','');
 
 % Calcualte power: per sample and average
+% First column of y1 & y2 holds real part
+% Second column of y1 & y2 holds imaginary part
 sf_len = size(y1,1);
 pwr_per_iq_sample = zeros(sf_len,2);
 for i = 1:sf_len
