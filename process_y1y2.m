@@ -16,7 +16,7 @@ sf_len = size(y1,1);
 pwr_per_iq_sample = zeros(sf_len,2);
 for i = 1:sf_len
     pwr_per_iq_sample(i,1) = str2double(y1(i,1))^2*str2double(y1(i,2))^2;
-    pwr_per_iq_sample(i,2) = str2double(y2(i,1))^2*str2double(y1(2,2))^2;
+    pwr_per_iq_sample(i,2) = str2double(y2(i,1))^2*str2double(y2(2,2))^2;
 end
 y1_avg_pwr = sum(pwr_per_iq_sample(:,1))/sf_len;
 y2_avg_pwr = sum(pwr_per_iq_sample(:,2))/sf_len;
