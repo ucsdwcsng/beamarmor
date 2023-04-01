@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 #include <fstream>
+#include <string>
 
 
 #include "srsenb/hdr/phy/txrx.h"
@@ -94,6 +95,7 @@ void txrx::run_thread()
   srsran::rf_buffer_t    buffer    = {};
   srsran::rf_timestamp_t timestamp = {};
   uint32_t               sf_len    = SRSRAN_SF_LEN_PRB(worker_com->get_nof_prb(0));
+  string tti_mod100 = "";
 
   float samp_rate = srsran_sampling_freq_hz(worker_com->get_nof_prb(0));
 
@@ -197,11 +199,12 @@ void txrx::run_thread()
     // std::cout << "Get raw y1 and y2" << '\n';
     cf_t* y1 = buffer.get(0);
     cf_t* y2 = buffer.get(1);
-    y1_file.open("../../y1.txt");
-    y2_file.open("../../y2.txt");
+    tti_mod100 = std::to_string(tti % 100);
+    y1_file.open("../../y1y2_for_100TTIs/y1_"+tti_mod100+".txt");
+    y2_file.open("../../y1y2_for_100TTIs/y2_"+tti_mod100+".txt");
     for (uint32_t i = 0; i < sf_len; i++) {
-      y1_file << (std::complex<double>)y1[i] << ',';
-      y2_file << (std::complex<double>)y2[i] << ',';
+      y1_file << (std::complex<double>)y1[i] << '\n';
+      y2_file << (std::complex<double>)y2[i] << '\n';
     }
     y1_file.close();
     y2_file.close();

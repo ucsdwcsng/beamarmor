@@ -11,7 +11,6 @@
 from packaging.version import Version as StrictVersion
 from PyQt5 import Qt
 from gnuradio import qtgui
-from gnuradio import blocks
 from gnuradio import gr
 from gnuradio.filter import firdes
 from gnuradio.fft import window
@@ -23,6 +22,7 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import uhd
 import time
+import sip
 
 
 
@@ -63,6 +63,7 @@ class grab_from_rx_srseNB_X300(gr.top_block, Qt.QWidget):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = 10e6
+        self.num_samples = num_samples = samp_rate*2
         self.cent_freq = cent_freq = 2.56e9
 
         ##################################################
@@ -89,17 +90,49 @@ class grab_from_rx_srseNB_X300(gr.top_block, Qt.QWidget):
         self.uhd_usrp_source_0.set_antenna("RX2", 1)
         self.uhd_usrp_source_0.set_bandwidth(samp_rate, 1)
         self.uhd_usrp_source_0.set_gain(10, 1)
-        self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_gr_complex*1, '/home/wcsng-23/Frederik/beam_armor/gr_scripts/rx1.iq', False)
-        self.blocks_file_sink_1.set_unbuffered(False)
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_gr_complex*1, '/home/wcsng-23/Frederik/beam_armor/gr_scripts/rx0.iq', False)
-        self.blocks_file_sink_0.set_unbuffered(False)
+        self.qtgui_sink_x_0_0 = qtgui.sink_c(
+            16384, #fftsize
+            window.WIN_BLACKMAN_hARRIS, #wintype
+            0, #fc
+            samp_rate, #bw
+            "", #name
+            True, #plotfreq
+            True, #plotwaterfall
+            True, #plottime
+            True, #plotconst
+            None # parent
+        )
+        self.qtgui_sink_x_0_0.set_update_time(1.0/10)
+        self._qtgui_sink_x_0_0_win = sip.wrapinstance(self.qtgui_sink_x_0_0.qwidget(), Qt.QWidget)
+
+        self.qtgui_sink_x_0_0.enable_rf_freq(False)
+
+        self.top_layout.addWidget(self._qtgui_sink_x_0_0_win)
+        self.qtgui_sink_x_0 = qtgui.sink_c(
+            16384, #fftsize
+            window.WIN_BLACKMAN_hARRIS, #wintype
+            0, #fc
+            samp_rate, #bw
+            "", #name
+            True, #plotfreq
+            True, #plotwaterfall
+            True, #plottime
+            True, #plotconst
+            None # parent
+        )
+        self.qtgui_sink_x_0.set_update_time(1.0/10)
+        self._qtgui_sink_x_0_win = sip.wrapinstance(self.qtgui_sink_x_0.qwidget(), Qt.QWidget)
+
+        self.qtgui_sink_x_0.enable_rf_freq(False)
+
+        self.top_layout.addWidget(self._qtgui_sink_x_0_win)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.uhd_usrp_source_0, 0), (self.blocks_file_sink_0, 0))
-        self.connect((self.uhd_usrp_source_0, 1), (self.blocks_file_sink_1, 0))
+        self.connect((self.uhd_usrp_source_0, 0), (self.qtgui_sink_x_0, 0))
+        self.connect((self.uhd_usrp_source_0, 1), (self.qtgui_sink_x_0_0, 0))
 
 
     def closeEvent(self, event):
@@ -115,9 +148,18 @@ class grab_from_rx_srseNB_X300(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
+        self.set_num_samples(self.samp_rate*2)
+        self.qtgui_sink_x_0.set_frequency_range(0, self.samp_rate)
+        self.qtgui_sink_x_0_0.set_frequency_range(0, self.samp_rate)
         self.uhd_usrp_source_0.set_samp_rate(self.samp_rate)
         self.uhd_usrp_source_0.set_bandwidth(self.samp_rate, 0)
         self.uhd_usrp_source_0.set_bandwidth(self.samp_rate, 1)
+
+    def get_num_samples(self):
+        return self.num_samples
+
+    def set_num_samples(self, num_samples):
+        self.num_samples = num_samples
 
     def get_cent_freq(self):
         return self.cent_freq

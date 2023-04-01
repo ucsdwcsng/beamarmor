@@ -13,5 +13,9 @@ timestamps_45right.txt
 gr_scripts/rx0.iq
 gr_scripts/rx1.iq
 diff_*.txt
+derive_alpha.m
+# y1 and y2 as received form srsenb
 y1.txt
 y2.txt
+boxplot_100alphas.jpg
+y1y2_for_100TTIs/
