@@ -75,6 +75,7 @@ option(ENABLE_BLADERF        "Enable BladeRF"                           ON)
 option(ENABLE_SOAPYSDR       "Enable SoapySDR"                          ON)
 option(ENABLE_SKIQ           "Enable Sidekiq SDK"                       ON)
 option(ENABLE_ZEROMQ         "Enable ZeroMQ"                            ON)
+option(ENABLE_MSGPACK         "Enable MessagePack"                      ON)
 option(ENABLE_HARDSIM        "Enable support for SIM cards"             ON)
 
 option(ENABLE_TTCN3          "Enable TTCN3 test binaries"               OFF)
@@ -248,6 +249,15 @@ if(ENABLE_ZEROMQ)
     link_directories(${ZEROMQ_LIBRARY_DIRS})
   endif(ZEROMQ_FOUND)
 endif(ENABLE_ZEROMQ)
+
+# MessagePack
+if(ENABLE_MSGPACK)
+  find_package(MsgPack REQUIRED)
+  if(MSGPACK_FOUND)
+    include_directories(${MSGPACK_INCLUDE_DIRS})
+    link_directories(${MSGPACK_LIBRARY_DIRS})
+  endif(MSGPACK_FOUND)
+endif(ENABLE_MSGPACK)
 
 # TimeProf
 if(ENABLE_TIMEPROF)

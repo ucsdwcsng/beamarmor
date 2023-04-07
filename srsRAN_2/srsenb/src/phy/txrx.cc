@@ -23,7 +23,8 @@
 
 #include <fstream>
 #include <string>
-
+#include <zmq.hpp>
+#include <msgpack.hpp>
 
 #include "srsenb/hdr/phy/txrx.h"
 #include "srsran/common/band_helper.h"
@@ -90,12 +91,60 @@ void txrx::stop()
   }
 }
 
+std::complex<double> get_alpha(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t& socket)
+{
+  // std::cout << "get alpha called" << '\n';
+  
+  // Send y1 and y2 via ZMQ:
+  int size = 4 * sf_len;
+  // Serialize the samples data using MessagePack
+  msgpack::sbuffer buffer;
+  msgpack::packer<msgpack::sbuffer> packer(&buffer);
+  // Pack the size of the sent samples first
+  packer.pack_array(size);
+
+  // Pack each sample's real and imaginary part
+  for (int i = 0; i < (int)sf_len; i++) {
+    std::complex<double> y1_sample = (std::complex<double>)y1[i];
+    std::complex<double> y2_sample = (std::complex<double>)y2[i];
+    packer.pack_double(std::floor(y1_sample.real() * 10e5) / 10e5);
+    packer.pack_double(std::floor(y1_sample.imag() * 10e5) / 10e5);
+    packer.pack_double(std::floor(y2_sample.real() * 10e5) / 10e5);
+    packer.pack_double(std::floor(y2_sample.imag() * 10e5) / 10e5);
+  }
+
+  // std::cout << "Set ZMQ message" << "; TTI: " << tti << '\n';
+  zmq::message_t y_msg(buffer.data(), buffer.size(), nullptr);
+  // std::cout << "Send from socket" << '\n';
+  socket.send(y_msg, zmq::send_flags::none);
+  
+  zmq::message_t reply;
+  socket.recv(reply, zmq::recv_flags::none);
+  // std::cout << "Received reply" << '\n';
+  
+  // De-serialize reply
+  msgpack::object_handle oh = msgpack::unpack(static_cast<char*>(reply.data()), reply.size());
+  msgpack::object obj = oh.get();
+
+  std::vector<double> alpha_parts = obj.as<std::vector<double>>();
+  std::complex<double> alpha{alpha_parts[0], alpha_parts[1]};
+  std::cout << "Alpha: " << alpha << '\n';
+
+  return alpha;
+}
+
 void txrx::run_thread()
 {
   srsran::rf_buffer_t    buffer    = {};
   srsran::rf_timestamp_t timestamp = {};
   uint32_t               sf_len    = SRSRAN_SF_LEN_PRB(worker_com->get_nof_prb(0));
-  string tti_mod100 = "";
+  // string tti_mod100 = ""; // Needed when y1 and y2 are written to file for 100 consecutive TTIs
+
+  // Init ZMQ: It is used to communicate y1 and y2 to an external program
+  // which calcualates alpha* and returns that value
+  zmq::context_t context(1);
+  zmq::socket_t socket(context, ZMQ_REQ);
+  socket.connect("tcp://localhost:5555");
 
   float samp_rate = srsran_sampling_freq_hz(worker_com->get_nof_prb(0));
 
@@ -199,15 +248,23 @@ void txrx::run_thread()
     // std::cout << "Get raw y1 and y2" << '\n';
     cf_t* y1 = buffer.get(0);
     cf_t* y2 = buffer.get(1);
-    tti_mod100 = std::to_string(tti % 100);
-    y1_file.open("../../y1y2_for_100TTIs/y1_"+tti_mod100+".txt");
-    y2_file.open("../../y1y2_for_100TTIs/y2_"+tti_mod100+".txt");
-    for (uint32_t i = 0; i < sf_len; i++) {
-      y1_file << (std::complex<double>)y1[i] << '\n';
-      y2_file << (std::complex<double>)y2[i] << '\n';
+
+    // Get alpha from external program every 100 TTI
+    if (tti % 1000 == 0)
+    {
+      std::complex<double> alpha = get_alpha(y1, y2, tti, sf_len, socket);
     }
-    y1_file.close();
-    y2_file.close();
+
+    // // Write y1 and y2 to file
+    // tti_mod100 = std::to_string(tti % 100);
+    // y1_file.open("../../y1y2_for_100TTIs/y1_"+tti_mod100+".txt");
+    // y2_file.open("../../y1y2_for_100TTIs/y2_"+tti_mod100+".txt");
+    // for (uint32_t i = 0; i < sf_len; i++) {
+    //   y1_file << (std::complex<double>)y1[i] << '\n';
+    //   y2_file << (std::complex<double>)y2[i] << '\n';
+    // }
+    // y1_file.close();
+    // y2_file.close();
 
     if (ul_channel) {
       ul_channel->run(buffer.to_cf_t(), buffer.to_cf_t(), sf_len, timestamp.get(0));
