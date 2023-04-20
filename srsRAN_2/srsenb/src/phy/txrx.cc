@@ -128,7 +128,7 @@ std::complex<double> get_alpha(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len
 
   std::vector<double> alpha_parts = obj.as<std::vector<double>>();
   std::complex<double> alpha{alpha_parts[0], alpha_parts[1]};
-  std::cout << "Alpha: " << alpha << '\n';
+  // std::cout << "Alpha: " << alpha << '\n';
 
   return alpha;
 }
@@ -138,7 +138,11 @@ void txrx::run_thread()
   srsran::rf_buffer_t    buffer    = {};
   srsran::rf_timestamp_t timestamp = {};
   uint32_t               sf_len    = SRSRAN_SF_LEN_PRB(worker_com->get_nof_prb(0));
-  // string tti_mod100 = ""; // Needed when y1 and y2 are written to file for 100 consecutive TTIs
+  // Needed when y1 and y2 are written to file for 100 consecutive TTIs:
+  // string tti_mod100 = "";
+  // ofstream y1_file, y2_file;
+  std::complex<double> alpha(0,0);
+  int alpha_compute_counter = 6;
 
   // Init ZMQ: It is used to communicate y1 and y2 to an external program
   // which calcualates alpha* and returns that value
@@ -149,8 +153,6 @@ void txrx::run_thread()
   float samp_rate = srsran_sampling_freq_hz(worker_com->get_nof_prb(0));
 
   srsran::srsran_band_helper band_helper;
-
-  ofstream y1_file, y2_file;
 
   // Configure radio
   radio_h->set_rx_srate(samp_rate);
@@ -244,16 +246,38 @@ void txrx::run_thread()
     buffer.set_nof_samples(sf_len);
     radio_h->rx_now(buffer, timestamp);
 
+    // NullSteer:
     // Get raw y1 and y2
     // std::cout << "Get raw y1 and y2" << '\n';
     cf_t* y1 = buffer.get(0);
     cf_t* y2 = buffer.get(1);
 
     // Get alpha from external program every 100 TTI
-    if (tti % 1000 == 0)
+    if (tti % 1000 == 0 && alpha_compute_counter != 42)
     {
-      std::complex<double> alpha = get_alpha(y1, y2, tti, sf_len, socket);
+      if (alpha_compute_counter < 5)
+      {
+        alpha = get_alpha(y1, y2, tti, sf_len, socket);
+        alpha_compute_counter++;
+      }
+      else if (alpha_compute_counter == 5)
+      {
+        std::cout << "Alpha compute stopped." << '\n';
+        std::cout << "Using alpha: " << alpha << '\n';
+        alpha_compute_counter = 42;
+      } else {
+        std::cout << "Using alpha: " << alpha << '\n';
+        alpha_compute_counter = 42;
+      }
     }
+
+    // Apply alpha to UL sample buffer
+    buffer.apply_alpha(alpha, sf_len);
+
+    // cf_t* tmp = lte_worker->get_buffer_rx(0, 0);
+    // printf("signal_buffer_rx[0][0]: %f+%fi\n", __real__ tmp[0], __imag__ tmp[0]);
+    // std::cout << "signal_buffer_rx[0] addr: " << tmp << '\n';
+    // std::cout << "-----------------------" << '\n';
 
     // // Write y1 and y2 to file
     // tti_mod100 = std::to_string(tti % 100);

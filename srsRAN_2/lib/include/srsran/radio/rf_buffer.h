@@ -22,6 +22,8 @@
 #ifndef SRSRAN_RF_BUFFER_H
 #define SRSRAN_RF_BUFFER_H
 
+#include <complex>
+
 #include "srsran/interfaces/radio_interfaces.h"
 
 namespace srsran {
@@ -120,6 +122,29 @@ public:
   void set(const uint32_t& logical_ch, const uint32_t& port_idx, const uint32_t& nof_antennas, cf_t* ptr) override
   {
     sample_buffer.at(logical_ch * nof_antennas + port_idx) = ptr;
+    // printf("sample_buffer set at: %d\n", logical_ch * nof_antennas + port_idx);
+  }
+  // NullSteer: Apply alpha
+  // Implementation is hard-coded for 1 component carrier (cc) with antennas 0 and 1
+  void apply_alpha(std::complex<double> alpha, uint32_t sf_len)
+  {
+    // printf("Using alpha: %f+%fi\n", alpha.real(), alpha.imag());
+    cf_t* y1_ptr = sample_buffer.at(0);
+    cf_t* y2_ptr = sample_buffer.at(1);
+    cf_t alpha_;
+    __real__ alpha_ = alpha.real();
+    __imag__ alpha_ = alpha.imag();
+    
+    // printf("y1_ptr[0]: %f+%fi\n", __real__ y1_ptr[0], __imag__ y1_ptr[0]);
+    // printf("y1_ptr addr: %p\n", y1_ptr);
+
+    // y1_ptr is same location as signal_buffer_rx[0] (in cc_worker.cc)
+    for (uint32_t i = 0; i < sf_len; i++) {
+      y1_ptr[i] = y1_ptr[i]+alpha_*y2_ptr[i];
+    }
+    
+    // printf("y1_ptr[0]: %f+%fi\n", __real__ y1_ptr[0], __imag__ y1_ptr[0]);
+    // printf("y1_ptr addr: %p\n", y1_ptr);
   }
   void set_combine(const uint32_t& channel_idx, cf_t* ptr)
   {
