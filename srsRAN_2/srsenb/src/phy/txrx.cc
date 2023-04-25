@@ -143,7 +143,7 @@ void txrx::run_thread()
   // ofstream y1_file, y2_file;
   std::complex<double> alpha(0,0);
   std::complex<double> dummy_alpha(0,0);
-  int alpha_compute_counter = 0;
+  int alpha_compute_counter = 66;
 
   // Init ZMQ: It is used to communicate y1 and y2 to an external program
   // which calcualates alpha* and returns that value

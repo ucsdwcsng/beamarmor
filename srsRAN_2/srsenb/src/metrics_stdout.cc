@@ -87,7 +87,7 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
                                         const std::vector<phy_metrics_t>& phy,
                                         bool                              is_nr)
 {
-  std::ofstream outfile("../../sinr_cqi.txt", std::ios::app);
+  std::ofstream outfile("../../sinr_bler.txt", std::ios::app);
   for (size_t i = 0; i < num_ue; i++) {
     // make sure we have stats for MAC and PHY layer too
     if (i >= mac.ues.size() || ((i >= phy.size()) && !is_nr)) {
@@ -105,15 +105,8 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
     fmt::print("{:>5x}", mac.ues[i].rnti);
     if (not iszero(mac.ues[i].dl_cqi)) {
       fmt::print("  {:>3}", int(mac.ues[i].dl_cqi));
-      // Write CQI to file
-      if (outfile.is_open()) {
-        outfile << int(mac.ues[i].dl_cqi) << ",";
-      }
     } else {
       fmt::print("  {:>3.3}", "n/a");
-      if (outfile.is_open()) {
-        outfile << "n/a,";
-      }
     }
     fmt::print("   {:>1}", int(mac.ues[i].dl_ri));
     float dl_mcs = (is_nr) ? mac.ues[i].dl_mcs : phy[i].dl.mcs;
@@ -187,8 +180,15 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
 
     if (mac.ues[i].rx_pkts > 0 && mac.ues[i].rx_errors > 0) {
       fmt::print(" {:>3}%", int((float)100 * mac.ues[i].rx_errors / mac.ues[i].rx_pkts));
+      // Write BLER to file
+      if (outfile.is_open()) {
+        outfile << int((float)100 * mac.ues[i].rx_errors / mac.ues[i].rx_pkts) << ",";
+      }
     } else {
       fmt::print(" {:>3}%", 0);
+      if (outfile.is_open()) {
+        outfile << 0 << ",";
+      }
     }
     fmt::print(" {:>6.6}", float_to_eng_string(mac.ues[i].ul_buffer, 2));
     fmt::print("\n");
