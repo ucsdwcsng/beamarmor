@@ -7,24 +7,16 @@
 # GNU Radio Python Flow Graph
 # Title: some_ofdm_signal
 # Description: Transmit a pre-defined signal (a complex sine) as OFDM packets.
-# GNU Radio version: 3.8.4.0
+# GNU Radio version: v3.11.0.0git-402-g54d199a2
 
-from distutils.version import StrictVersion
-
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print("Warning: failed to XInitThreads()")
-
+from packaging.version import Version as StrictVersion
+from PyQt5 import Qt
+from gnuradio import qtgui
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import gr
 from gnuradio.filter import firdes
+from gnuradio.fft import window
 import sys
 import signal
 from PyQt5 import Qt
@@ -34,19 +26,19 @@ from gnuradio import eng_notation
 from gnuradio import uhd
 import time
 
-from gnuradio import qtgui
+
 
 class some_ofdm_signal(gr.top_block, Qt.QWidget):
 
     def __init__(self):
-        gr.top_block.__init__(self, "some_ofdm_signal")
+        gr.top_block.__init__(self, "some_ofdm_signal", catch_exceptions=True)
         Qt.QWidget.__init__(self)
         self.setWindowTitle("some_ofdm_signal")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
-        except:
-            pass
+        except BaseException as exc:
+            print(f"Qt GUI: Could not set Icon: {str(exc)}", file=sys.stderr)
         self.top_scroll_layout = Qt.QVBoxLayout()
         self.setLayout(self.top_scroll_layout)
         self.top_scroll = Qt.QScrollArea()
@@ -66,8 +58,8 @@ class some_ofdm_signal(gr.top_block, Qt.QWidget):
                 self.restoreGeometry(self.settings.value("geometry").toByteArray())
             else:
                 self.restoreGeometry(self.settings.value("geometry"))
-        except:
-            pass
+        except BaseException as exc:
+            print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
 
         ##################################################
         # Variables
@@ -80,6 +72,7 @@ class some_ofdm_signal(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
+
         self.uhd_usrp_sink_0 = uhd.usrp_sink(
             ",".join(("", "")),
             uhd.stream_args(
@@ -89,14 +82,15 @@ class some_ofdm_signal(gr.top_block, Qt.QWidget):
             ),
             '',
         )
-        self.uhd_usrp_sink_0.set_center_freq(2.56e9, 0)
-        self.uhd_usrp_sink_0.set_gain(30, 0)
-        self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
         self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
-        self.uhd_usrp_sink_0.set_time_unknown_pps(uhd.time_spec())
+        self.uhd_usrp_sink_0.set_time_unknown_pps(uhd.time_spec(0))
+
+        self.uhd_usrp_sink_0.set_center_freq(2.56e9, 0)
+        self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
+        self.uhd_usrp_sink_0.set_gain(30, 0)
         self.digital_ofdm_tx_0 = digital.ofdm_tx(
             fft_len=fft_len,
-            cp_len=fft_len//4,
+            cp_len=(fft_len//4),
             packet_length_tag_key=len_tag_key,
             occupied_carriers=((-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30),),
             pilot_carriers=((-32,-31,31,32),),
@@ -123,6 +117,9 @@ class some_ofdm_signal(gr.top_block, Qt.QWidget):
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "some_ofdm_signal")
         self.settings.setValue("geometry", self.saveGeometry())
+        self.stop()
+        self.wait()
+
         event.accept()
 
     def get_samp_rate(self):
@@ -156,7 +153,6 @@ class some_ofdm_signal(gr.top_block, Qt.QWidget):
 
 
 
-
 def main(top_block_cls=some_ofdm_signal, options=None):
 
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
@@ -171,6 +167,9 @@ def main(top_block_cls=some_ofdm_signal, options=None):
     tb.show()
 
     def sig_handler(sig=None, frame=None):
+        tb.stop()
+        tb.wait()
+
         Qt.QApplication.quit()
 
     signal.signal(signal.SIGINT, sig_handler)
@@ -180,11 +179,6 @@ def main(top_block_cls=some_ofdm_signal, options=None):
     timer.start(500)
     timer.timeout.connect(lambda: None)
 
-    def quitting():
-        tb.stop()
-        tb.wait()
-
-    qapp.aboutToQuit.connect(quitting)
     qapp.exec_()
 
 if __name__ == '__main__':

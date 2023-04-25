@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <fstream>
+
 using namespace std;
 
 namespace srsenb {
@@ -85,6 +87,7 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
                                         const std::vector<phy_metrics_t>& phy,
                                         bool                              is_nr)
 {
+  std::ofstream outfile("../../sinr_cqi.txt", std::ios::app);
   for (size_t i = 0; i < num_ue; i++) {
     // make sure we have stats for MAC and PHY layer too
     if (i >= mac.ues.size() || ((i >= phy.size()) && !is_nr)) {
@@ -102,8 +105,15 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
     fmt::print("{:>5x}", mac.ues[i].rnti);
     if (not iszero(mac.ues[i].dl_cqi)) {
       fmt::print("  {:>3}", int(mac.ues[i].dl_cqi));
+      // Write CQI to file
+      if (outfile.is_open()) {
+        outfile << int(mac.ues[i].dl_cqi) << ",";
+      }
     } else {
       fmt::print("  {:>3.3}", "n/a");
+      if (outfile.is_open()) {
+        outfile << "n/a,";
+      }
     }
     fmt::print("   {:>1}", int(mac.ues[i].dl_ri));
     float dl_mcs = (is_nr) ? mac.ues[i].dl_mcs : phy[i].dl.mcs;
@@ -139,8 +149,15 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
     float pusch_sinr = (is_nr) ? mac.ues[i].pusch_sinr : phy[i].ul.pusch_sinr;
     if (not isnan(pusch_sinr) and not iszero(pusch_sinr)) {
       fmt::print(" {:>5.1f}", clamp_sinr(pusch_sinr));
+      // Write SINR to file
+      if (outfile.is_open()) {
+        outfile << clamp_sinr(pusch_sinr) << ",";
+      }
     } else {
       fmt::print(" {:>5.5}", "n/a");
+      if (outfile.is_open()) {
+        outfile << "n/a,";
+      }
     }
     float pucch_sinr = (is_nr) ? mac.ues[i].pucch_sinr : phy[i].ul.pucch_sinr;
     if (not isnan(pucch_sinr) and not iszero(pucch_sinr)) {
@@ -176,6 +193,7 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
     fmt::print(" {:>6.6}", float_to_eng_string(mac.ues[i].ul_buffer, 2));
     fmt::print("\n");
   }
+  outfile.close();
 }
 
 void metrics_stdout::set_metrics(const enb_metrics_t& metrics, const uint32_t period_usec)

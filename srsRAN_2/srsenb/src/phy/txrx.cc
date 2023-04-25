@@ -142,7 +142,8 @@ void txrx::run_thread()
   // string tti_mod100 = "";
   // ofstream y1_file, y2_file;
   std::complex<double> alpha(0,0);
-  int alpha_compute_counter = 6;
+  std::complex<double> dummy_alpha(0,0);
+  int alpha_compute_counter = 0;
 
   // Init ZMQ: It is used to communicate y1 and y2 to an external program
   // which calcualates alpha* and returns that value
@@ -253,26 +254,38 @@ void txrx::run_thread()
     cf_t* y2 = buffer.get(1);
 
     // Get alpha from external program every 100 TTI
-    if (tti % 1000 == 0 && alpha_compute_counter != 42)
+    if (tti % 1000 == 0 && alpha_compute_counter != 99)
     {
       if (alpha_compute_counter < 5)
       {
+        std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
+        std::cout << "Using alpha: " << dummy_alpha << '\n';
         alpha = get_alpha(y1, y2, tti, sf_len, socket);
         alpha_compute_counter++;
       }
-      else if (alpha_compute_counter == 5)
-      {
+      else if(alpha_compute_counter == 5) {
         std::cout << "Alpha compute stopped." << '\n';
-        std::cout << "Using alpha: " << alpha << '\n';
-        alpha_compute_counter = 42;
-      } else {
-        std::cout << "Using alpha: " << alpha << '\n';
-        alpha_compute_counter = 42;
+        std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
+        std::cout << "Using alpha: " << dummy_alpha << '\n';
+        alpha_compute_counter++;
+      }
+      else if (alpha_compute_counter == 66)
+      {
+        std::cout << "Using NEW alpha: " << alpha << '\n';
+        alpha_compute_counter = 99;
+      } else {        
+        std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
+        std::cout << "Using alpha: " << dummy_alpha << '\n';
+        alpha_compute_counter++;
       }
     }
 
     // Apply alpha to UL sample buffer
-    buffer.apply_alpha(alpha, sf_len);
+    if (alpha_compute_counter == 99) {
+      buffer.apply_alpha(alpha, sf_len);
+    } else {
+      buffer.apply_alpha(dummy_alpha, sf_len);
+    }
 
     // cf_t* tmp = lte_worker->get_buffer_rx(0, 0);
     // printf("signal_buffer_rx[0][0]: %f+%fi\n", __real__ tmp[0], __imag__ tmp[0]);
