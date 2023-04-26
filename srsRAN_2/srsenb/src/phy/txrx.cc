@@ -25,6 +25,7 @@
 #include <string>
 #include <zmq.hpp>
 #include <msgpack.hpp>
+#include <chrono>
 
 #include "srsenb/hdr/phy/txrx.h"
 #include "srsran/common/band_helper.h"
@@ -141,6 +142,8 @@ void txrx::run_thread()
   // Needed when y1 and y2 are written to file for 100 consecutive TTIs:
   // string tti_mod100 = "";
   // ofstream y1_file, y2_file;
+  // std::ofstream get_alpha_rrt("../../get_alpha_rtt.txt", std::ios::app);
+  // NullSteer
   std::complex<double> alpha(0,0);
   std::complex<double> dummy_alpha(0,0);
   int alpha_compute_counter = 66;
@@ -271,7 +274,14 @@ void txrx::run_thread()
       }
       else if (alpha_compute_counter == 66)
       {
-        std::cout << "Using NEW alpha: " << alpha << '\n';
+        // std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+        // alpha = get_alpha(y1, y2, tti, sf_len, socket);
+        // std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        // std::chrono::duration<double> elapsed_seconds = end - start;
+        // if (get_alpha_rrt.is_open()) {
+        //   get_alpha_rrt << elapsed_seconds.count() << ",";
+        // }
+        std::cout << "Using alpha: " << dummy_alpha << '\n';
         alpha_compute_counter = 99;
       } else {        
         std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
@@ -292,16 +302,20 @@ void txrx::run_thread()
     // std::cout << "signal_buffer_rx[0] addr: " << tmp << '\n';
     // std::cout << "-----------------------" << '\n';
 
-    // // Write y1 and y2 to file
+    // Write y1 and y2 to file
     // tti_mod100 = std::to_string(tti % 100);
     // y1_file.open("../../y1y2_for_100TTIs/y1_"+tti_mod100+".txt");
     // y2_file.open("../../y1y2_for_100TTIs/y2_"+tti_mod100+".txt");
-    // for (uint32_t i = 0; i < sf_len; i++) {
-    //   y1_file << (std::complex<double>)y1[i] << '\n';
-    //   y2_file << (std::complex<double>)y2[i] << '\n';
+    // if ((tti+500) % 1000 == 0) {
+    //   y1_file.open("../../y1_.txt");
+    //   y2_file.open("../../y2_.txt");
+    //   for (uint32_t i = 0; i < sf_len; i++) {
+    //     y1_file << (std::complex<double>)y1[i] << '\n';
+    //     y2_file << (std::complex<double>)y2[i] << '\n';
+    //   }
+    //   y1_file.close();
+    //   y2_file.close();
     // }
-    // y1_file.close();
-    // y2_file.close();
 
     if (ul_channel) {
       ul_channel->run(buffer.to_cf_t(), buffer.to_cf_t(), sf_len, timestamp.get(0));

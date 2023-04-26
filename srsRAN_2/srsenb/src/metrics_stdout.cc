@@ -87,7 +87,7 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
                                         const std::vector<phy_metrics_t>& phy,
                                         bool                              is_nr)
 {
-  std::ofstream outfile("../../sinr_bler.txt", std::ios::app);
+  std::ofstream outfile("../../sinr_brate_bler.txt", std::ios::app);
   for (size_t i = 0; i < num_ue; i++) {
     // make sure we have stats for MAC and PHY layer too
     if (i >= mac.ues.size() || ((i >= phy.size()) && !is_nr)) {
@@ -172,8 +172,15 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
     }
     if (mac.ues[i].rx_brate > 0) {
       fmt::print(" {:>6.6}", float_to_eng_string((float)mac.ues[i].rx_brate / (mac.ues[i].nof_tti * 1e-3), 1));
+      // Write brate to file
+      if (outfile.is_open()) {
+        outfile << (float)mac.ues[i].rx_brate / (mac.ues[i].nof_tti * 1e-3) << ",";
+      }
     } else {
       fmt::print(" {:>6}", 0);
+      if (outfile.is_open()) {
+        outfile << 0 << ",";
+      }
     }
     fmt::print(" {:>4}", mac.ues[i].rx_pkts - mac.ues[i].rx_errors);
     fmt::print(" {:>4}", mac.ues[i].rx_errors);

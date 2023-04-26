@@ -13,12 +13,25 @@ def compute_alpha(y1y2):
     y1 = np.array(y1y2[::4], dtype=complex) + 1j*np.array(y1y2[1::4], dtype=complex)
     y2 = np.array(y1y2[2::4], dtype=complex) + 1j*np.array(y1y2[3::4], dtype=complex)
 
+    # Save y1 and y2 to file
+    # np.savetxt('y1.txt', y1, delimiter=',')
+    # np.savetxt('y2.txt', y1, delimiter=',')
+
     # Compute alpha
     alpha = (-1) * np.dot(np.transpose(y2.conj()), y1) / np.dot(np.transpose(y2.conj()), y2)
     print("Alpha: ", alpha)
 
     # Return alpha
     return alpha
+
+def save_y1y2_to_file(y1y2):
+    y1 = np.array(y1y2[::4], dtype=complex) + 1j*np.array(y1y2[1::4], dtype=complex)
+    y2 = np.array(y1y2[2::4], dtype=complex) + 1j*np.array(y1y2[3::4], dtype=complex)
+
+    # Save y1 and y2 to file
+    np.savetxt('y1.txt', y1, delimiter=',')
+    np.savetxt('y2.txt', y2, delimiter=',')
+
 
 if __name__ == "__main__":
 
@@ -31,17 +44,23 @@ if __name__ == "__main__":
     while True:
         reply = socket.recv()
         print("Received message.")
+        print("Sending immediate response!")
+        # Send back a dummy alpha = 0
+        immediate_msg = msgpack.packb([0, 0])
+        socket.send(immediate_msg)
         reply_unpacked = msgpack.unpackb(reply)
-        print("y1.1 real:", reply_unpacked[0])
-        print("y1.1 imag:", reply_unpacked[1])
-        print("y2.1 real:", reply_unpacked[2])
-        print("y2.1 imag:", reply_unpacked[3])
+        save_y1y2_to_file(reply_unpacked)
+        print("y1y2 file saved!")
+        # print("y1.1 real:", reply_unpacked[0])
+        # print("y1.1 imag:", reply_unpacked[1])
+        # print("y2.1 real:", reply_unpacked[2])
+        # print("y2.1 imag:", reply_unpacked[3])
 
-        print("Compute alpha now...")
-        # print("Length of reply: ", len(reply_unpacked))
-        alpha = compute_alpha(reply_unpacked)
+        # print("Compute alpha now...")
+        # # print("Length of reply: ", len(reply_unpacked))
+        # alpha = compute_alpha(reply_unpacked)
 
-        # Return alpha to srseNB
-        alpha_msg = msgpack.packb([alpha.real, alpha.imag])
-        socket.send(alpha_msg)
-        # socket.send_string("ACK")
+        # # Return alpha to srseNB
+        # alpha_msg = msgpack.packb([alpha.real, alpha.imag])
+        # socket.send(alpha_msg)
+        # # socket.send_string("ACK")
