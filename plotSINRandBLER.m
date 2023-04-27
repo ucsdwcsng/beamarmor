@@ -2,9 +2,10 @@ clear;
 
 figure;
 
-for i = 1:3
-    file_name = "/home/wcsng-24/Frederik/measurements/ue_enb_various_gains/"...
-        +"5db_gain/UDP10Mbits/1in100TTImsg/m"+num2str(i)+"_sinr_brate_bler.txt";
+for i = 1:8
+    file_name = "/home/wcsng-24/Frederik/measurements/6mBetweenUE+eNB_"...
+        +"30dB5MHzjammer/eNBandUE18dBgain/jammerPosition1/withBeamArmor"...
+        +"/m"+num2str(i)+"_sinr_brate_bler.txt";
     A = readmatrix(file_name);
     len_t = length(A)/3;
     B = reshape(A, 3, len_t);
@@ -25,7 +26,7 @@ for i = 1:3
 %     y2_up_lim = round(max(cqi)+1);
 %     y2_low_lim = round(min(cqi)-1);
     
-    subplot(1,3,i);
+    subplot(2,4,i);
     if len_t <= 16
         xticks(0:2:len_t-1)
     else

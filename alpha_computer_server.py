@@ -44,23 +44,25 @@ if __name__ == "__main__":
     while True:
         reply = socket.recv()
         print("Received message.")
-        print("Sending immediate response!")
-        # Send back a dummy alpha = 0
-        immediate_msg = msgpack.packb([0, 0])
-        socket.send(immediate_msg)
         reply_unpacked = msgpack.unpackb(reply)
-        save_y1y2_to_file(reply_unpacked)
-        print("y1y2 file saved!")
+        # print("Sending immediate response!")
+        # Send back a dummy alpha = 0
+        # immediate_msg = msgpack.packb([0, 0])
+        # socket.send(immediate_msg)
+
         # print("y1.1 real:", reply_unpacked[0])
         # print("y1.1 imag:", reply_unpacked[1])
         # print("y2.1 real:", reply_unpacked[2])
         # print("y2.1 imag:", reply_unpacked[3])
 
-        # print("Compute alpha now...")
+        print("Compute alpha now...")
         # # print("Length of reply: ", len(reply_unpacked))
-        # alpha = compute_alpha(reply_unpacked)
+        alpha = compute_alpha(reply_unpacked)
 
-        # # Return alpha to srseNB
-        # alpha_msg = msgpack.packb([alpha.real, alpha.imag])
-        # socket.send(alpha_msg)
-        # # socket.send_string("ACK")
+        # Return alpha to srseNB
+        alpha_msg = msgpack.packb([alpha.real, alpha.imag])
+        socket.send(alpha_msg)
+        # socket.send_string("ACK")
+        
+        save_y1y2_to_file(reply_unpacked)
+        print("y1y2 file saved!")

@@ -261,16 +261,17 @@ void txrx::run_thread()
     {
       if (alpha_compute_counter < 5)
       {
-        std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
+        // std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
         std::cout << "Using alpha: " << dummy_alpha << '\n';
         alpha = get_alpha(y1, y2, tti, sf_len, socket);
         alpha_compute_counter++;
       }
       else if(alpha_compute_counter == 5) {
         std::cout << "Alpha compute stopped." << '\n';
-        std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
-        std::cout << "Using alpha: " << dummy_alpha << '\n';
-        alpha_compute_counter++;
+        // std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
+        std::cout << "Using NEW alpha: " << alpha << '\n';
+        // alpha_compute_counter++;
+        alpha_compute_counter = 99;
       }
       else if (alpha_compute_counter == 66)
       {
