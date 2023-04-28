@@ -24,13 +24,13 @@ def compute_alpha(y1y2):
     # Return alpha
     return alpha
 
-def save_y1y2_to_file(y1y2):
+def save_y1y2_to_file(y1y2, suffix):
     y1 = np.array(y1y2[::4], dtype=complex) + 1j*np.array(y1y2[1::4], dtype=complex)
     y2 = np.array(y1y2[2::4], dtype=complex) + 1j*np.array(y1y2[3::4], dtype=complex)
 
     # Save y1 and y2 to file
-    np.savetxt('y1.txt', y1, delimiter=',')
-    np.savetxt('y2.txt', y2, delimiter=',')
+    np.savetxt('y1_'+str(suffix)+'.txt', y1, delimiter=',')
+    np.savetxt('y2_'+str(suffix)+'.txt', y2, delimiter=',')
 
 
 if __name__ == "__main__":
@@ -40,29 +40,32 @@ if __name__ == "__main__":
 
     socket.bind("tcp://*:5555")
 
+    times_y1y2_saved = 0
+
     print("alpha-compute server started.")
     while True:
         reply = socket.recv()
         print("Received message.")
         reply_unpacked = msgpack.unpackb(reply)
-        # print("Sending immediate response!")
         # Send back a dummy alpha = 0
-        # immediate_msg = msgpack.packb([0, 0])
-        # socket.send(immediate_msg)
+        print("Sending immediate response!")
+        immediate_msg = msgpack.packb([0, 0])
+        socket.send(immediate_msg)
 
         # print("y1.1 real:", reply_unpacked[0])
         # print("y1.1 imag:", reply_unpacked[1])
         # print("y2.1 real:", reply_unpacked[2])
         # print("y2.1 imag:", reply_unpacked[3])
 
-        print("Compute alpha now...")
+        # print("Compute alpha now...")
         # # print("Length of reply: ", len(reply_unpacked))
-        alpha = compute_alpha(reply_unpacked)
+        # alpha = compute_alpha(reply_unpacked)
 
         # Return alpha to srseNB
-        alpha_msg = msgpack.packb([alpha.real, alpha.imag])
-        socket.send(alpha_msg)
+        # alpha_msg = msgpack.packb([alpha.real, alpha.imag])
+        # socket.send(alpha_msg)
         # socket.send_string("ACK")
         
-        save_y1y2_to_file(reply_unpacked)
+        save_y1y2_to_file(reply_unpacked, times_y1y2_saved)
         print("y1y2 file saved!")
+        times_y1y2_saved += 1
