@@ -259,36 +259,45 @@ void txrx::run_thread()
     // Get alpha from external program every 100 TTI
     if (tti % 1000 == 0 && alpha_compute_counter != 99)
     {
-      if (alpha_compute_counter < 5)
-      {
-        // std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
-        std::cout << "Using alpha: " << dummy_alpha << '\n';
+      if (alpha_compute_counter < 60) {
+        std::cout << 60-alpha_compute_counter << " seconds remaining" << '\n';
+        alpha_compute_counter++;
+      } else {
+        std::cout << "Sending y1 and y2" << '\n';
         alpha = get_alpha(y1, y2, tti, sf_len, socket);
-        alpha_compute_counter++;
+        std::cout << "Resetting alpha_compute_counter" << '\n';
+        alpha_compute_counter = 0;
       }
-      else if(alpha_compute_counter == 5) {
-        std::cout << "Alpha compute stopped." << '\n';
-        // std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
-        std::cout << "Using NEW alpha: " << alpha << '\n';
-        // alpha_compute_counter++;
-        alpha_compute_counter = 99;
-      }
-      else if (alpha_compute_counter == 66)
-      {
-        // std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-        // alpha = get_alpha(y1, y2, tti, sf_len, socket);
-        // std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-        // std::chrono::duration<double> elapsed_seconds = end - start;
-        // if (get_alpha_rrt.is_open()) {
-        //   get_alpha_rrt << elapsed_seconds.count() << ",";
-        // }
-        std::cout << "Using alpha: " << dummy_alpha << '\n';
-        alpha_compute_counter = 99;
-      } else {        
-        std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
-        std::cout << "Using alpha: " << dummy_alpha << '\n';
-        alpha_compute_counter++;
-      }
+      // if (alpha_compute_counter < 5)
+      // {
+      //   // std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
+      //   std::cout << "Using alpha: " << dummy_alpha << '\n';
+      //   alpha = get_alpha(y1, y2, tti, sf_len, socket);
+      //   alpha_compute_counter++;
+      // }
+      // else if(alpha_compute_counter == 5) {
+      //   std::cout << "Alpha compute stopped." << '\n';
+      //   // std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
+      //   std::cout << "Using NEW alpha: " << alpha << '\n';
+      //   // alpha_compute_counter++;
+      //   alpha_compute_counter = 99;
+      // }
+      // else if (alpha_compute_counter == 66)
+      // {
+      //   // std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+      //   // alpha = get_alpha(y1, y2, tti, sf_len, socket);
+      //   // std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+      //   // std::chrono::duration<double> elapsed_seconds = end - start;
+      //   // if (get_alpha_rrt.is_open()) {
+      //   //   get_alpha_rrt << elapsed_seconds.count() << ",";
+      //   // }
+      //   std::cout << "Using alpha: " << dummy_alpha << '\n';
+      //   alpha_compute_counter = 99;
+      // } else {        
+      //   std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
+      //   std::cout << "Using alpha: " << dummy_alpha << '\n';
+      //   alpha_compute_counter++;
+      // }
     }
 
     // Apply alpha to UL sample buffer
