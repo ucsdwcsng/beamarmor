@@ -3,9 +3,8 @@ clear;
 figure;
 
 for i = 1:8
-    file_name = "/home/wcsng-24/Frederik/measurements/6mBetweenUE+eNB_"...
-        +"30dB5MHzjammer/eNBandUE18dBgain/jammerPosition1/withBeamArmor"...
-        +"/m"+num2str(i)+"_sinr_brate_bler.txt";
+    file_name = "measurements/6mBetweenUE+eNB_18dBgain/5MHz30dBJammer/"...
+        +"jammerPosition1/noBeamArmor/m"+num2str(i)+"_sinr_brate_bler.txt";
     A = readmatrix(file_name);
     len_t = length(A)/3;
     B = reshape(A, 3, len_t);
@@ -35,7 +34,11 @@ for i = 1:8
     xlabel("time in seconds")
     yyaxis left
     plot(t, sinr);
-    ylim([y1_low_lim, y1_up_lim])
+    if y1_low_lim < 0
+        ylim([0, y1_up_lim])
+    else
+        ylim([y1_low_lim, y1_up_lim])
+    end
     yticks(y1_low_lim:1:y1_up_lim)
     ylabel('SINR in dB')
     yyaxis right
