@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <fstream>
+
 using namespace std;
 
 namespace srsenb {
@@ -85,6 +87,7 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
                                         const std::vector<phy_metrics_t>& phy,
                                         bool                              is_nr)
 {
+  std::ofstream outfile("../../sinr_brate_bler.txt", std::ios::app);
   for (size_t i = 0; i < num_ue; i++) {
     // make sure we have stats for MAC and PHY layer too
     if (i >= mac.ues.size() || ((i >= phy.size()) && !is_nr)) {
@@ -139,8 +142,15 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
     float pusch_sinr = (is_nr) ? mac.ues[i].pusch_sinr : phy[i].ul.pusch_sinr;
     if (not isnan(pusch_sinr) and not iszero(pusch_sinr)) {
       fmt::print(" {:>5.1f}", clamp_sinr(pusch_sinr));
+      // Write SINR to file
+      if (outfile.is_open()) {
+        outfile << clamp_sinr(pusch_sinr) << ",";
+      }
     } else {
       fmt::print(" {:>5.5}", "n/a");
+      if (outfile.is_open()) {
+        outfile << "n/a,";
+      }
     }
     float pucch_sinr = (is_nr) ? mac.ues[i].pucch_sinr : phy[i].ul.pucch_sinr;
     if (not isnan(pucch_sinr) and not iszero(pucch_sinr)) {
@@ -162,16 +172,30 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
     }
     if (mac.ues[i].rx_brate > 0) {
       fmt::print(" {:>6.6}", float_to_eng_string((float)mac.ues[i].rx_brate / (mac.ues[i].nof_tti * 1e-3), 1));
+      // Write brate to file
+      if (outfile.is_open()) {
+        outfile << (float)mac.ues[i].rx_brate / (mac.ues[i].nof_tti * 1e-3) << ",";
+      }
     } else {
       fmt::print(" {:>6}", 0);
-    }
+      if (outfile.is_open()) {
+        outfile << 0 << ",";
+      }
+    } 
     fmt::print(" {:>4}", mac.ues[i].rx_pkts - mac.ues[i].rx_errors);
     fmt::print(" {:>4}", mac.ues[i].rx_errors);
 
     if (mac.ues[i].rx_pkts > 0 && mac.ues[i].rx_errors > 0) {
       fmt::print(" {:>3}%", int((float)100 * mac.ues[i].rx_errors / mac.ues[i].rx_pkts));
+      // Write BLER to file
+      if (outfile.is_open()) {
+        outfile << int((float)100 * mac.ues[i].rx_errors / mac.ues[i].rx_pkts) << ",";
+      }
     } else {
       fmt::print(" {:>3}%", 0);
+      if (outfile.is_open()) {
+        outfile << 0 << ",";
+      }
     }
     fmt::print(" {:>6.6}", float_to_eng_string(mac.ues[i].ul_buffer, 2));
     fmt::print("\n");

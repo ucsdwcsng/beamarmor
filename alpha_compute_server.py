@@ -1,3 +1,5 @@
+from time import sleep
+import time
 import zmq
 import numpy as np
 import msgpack
@@ -23,25 +25,38 @@ def compute_alpha(y1y2):
 if __name__ == "__main__":
 
     context = zmq.Context()
-    socket = context.socket(zmq.REP)
+    subscriber_socket = context.socket(zmq.SUB)
+    subscriber_socket.connect("tcp://localhost:5555")
+    subscriber_socket.setsockopt(zmq.SUBSCRIBE, b"")
+    
+    publisher_socket = context.socket(zmq.PUB)
+    publisher_socket.bind("tcp://*:5556")
 
-    socket.bind("tcp://*:5555")
-
+    last_msg_id = None
+    
     print("alpha-compute server started.")
-    while True:
-        reply = socket.recv()
-        print("Received message.")
-        reply_unpacked = msgpack.unpackb(reply)
-        print("y1.1 real:", reply_unpacked[0])
-        print("y1.1 imag:", reply_unpacked[1])
-        print("y2.1 real:", reply_unpacked[2])
-        print("y2.1 imag:", reply_unpacked[3])
 
-        print("Compute alpha now...")
+    while True:
+        # alpha = 0
+        reply = subscriber_socket.recv()
+        print("Received message.")
+        
+        # reply_unpacked = msgpack.unpackb(reply)
+        # print("y1.1 real:", reply_unpacked[0])
+        # print("y1.1 imag:", reply_unpacked[1])
+        # print("y2.1 real:", reply_unpacked[2])
+        # print("y2.1 imag:", reply_unpacked[3])
+
+        # print("Compute alpha now...")
         # print("Length of reply: ", len(reply_unpacked))
-        alpha = compute_alpha(reply_unpacked)
+        # alpha = compute_alpha(reply_unpacked)
+        
+        # Sending dummy alpha immediatley
+        alpha = 0
 
         # Return alpha to srseNB
         alpha_msg = msgpack.packb([alpha.real, alpha.imag])
-        socket.send(alpha_msg)
+        publisher_socket.send(alpha_msg)
+        # print("Sleeping 2 sec")
+        # sleep(2)
         # socket.send_string("ACK")

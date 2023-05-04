@@ -91,7 +91,7 @@ void txrx::stop()
   }
 }
 
-std::complex<double> get_alpha(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t& socket)
+void send_y1y2(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t& publisher)
 {
   // std::cout << "get alpha called" << '\n';
   
@@ -115,22 +115,39 @@ std::complex<double> get_alpha(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len
 
   // std::cout << "Set ZMQ message" << "; TTI: " << tti << '\n';
   zmq::message_t y_msg(buffer.data(), buffer.size(), nullptr);
-  // std::cout << "Send from socket" << '\n';
-  socket.send(y_msg, zmq::send_flags::none);
-  
-  zmq::message_t reply;
-  socket.recv(reply, zmq::recv_flags::none);
-  // std::cout << "Received reply" << '\n';
-  
-  // De-serialize reply
-  msgpack::object_handle oh = msgpack::unpack(static_cast<char*>(reply.data()), reply.size());
-  msgpack::object obj = oh.get();
+  publisher.send(y_msg, zmq::send_flags::none);
+  // std::cout << "Sent y1y2 from socket" << '\n';
 
-  std::vector<double> alpha_parts = obj.as<std::vector<double>>();
-  std::complex<double> alpha{alpha_parts[0], alpha_parts[1]};
-  // std::cout << "Alpha: " << alpha << '\n';
+}
 
-  return alpha;
+std::complex<double> poll_alpha(zmq::socket_t& subscriber, std::complex<double> prev_alpha) {
+  // Create a poll item for the ZMQ socket
+  zmq_pollitem_t poll_items[] = { { subscriber, 0, ZMQ_POLLIN, 0 } };
+  
+  // Poll for messages for 100 microseconds
+  int poll_result = zmq_poll(poll_items, 1, 0.1);
+
+  // Check if a message was received
+  if (poll_result > 0 && poll_items[0].revents & ZMQ_POLLIN) {
+    // Receive and process the message
+    zmq::message_t reply;
+    subscriber.recv(reply, zmq::recv_flags::none);
+    std::cout << "Received reply" << '\n';
+    
+    // De-serialize reply
+    msgpack::object_handle oh = msgpack::unpack(static_cast<char*>(reply.data()), reply.size());
+    msgpack::object obj = oh.get();
+
+    std::vector<double> alpha_parts = obj.as<std::vector<double>>();
+    std::complex<double> alpha{alpha_parts[0], alpha_parts[1]};
+    std::cout << "Alpha: " << alpha << '\n';
+
+    return alpha;
+  } else {
+    // No message received within the timeout period, retunrn previous alpha
+    // std::cout << "No reply received" << '\n';
+    return prev_alpha;
+  }
 }
 
 void txrx::run_thread()
@@ -146,10 +163,14 @@ void txrx::run_thread()
   int alpha_compute_counter = 0;
 
   // Init ZMQ: It is used to communicate y1 and y2 to an external program
-  // which calcualates alpha* and returns that value
-  zmq::context_t context(1);
-  zmq::socket_t socket(context, ZMQ_REQ);
-  socket.connect("tcp://localhost:5555");
+  // which calcualates alpha and returns that value
+  zmq::context_t context_sub(1);
+  zmq::context_t context_pub(1);
+  zmq::socket_t subscriber(context_sub, ZMQ_SUB);
+  zmq::socket_t publisher(context_pub, ZMQ_PUB);
+  subscriber.connect("tcp://localhost:5556");
+  subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
+  publisher.bind("tcp://*:5555");
 
   float samp_rate = srsran_sampling_freq_hz(worker_com->get_nof_prb(0));
 
@@ -254,34 +275,22 @@ void txrx::run_thread()
     cf_t* y2 = buffer.get(1);
 
     // Get alpha from external program every 100 TTI
-    if (tti % 1000 == 0 && alpha_compute_counter != 99)
+    if (tti % 100 == 0 && alpha_compute_counter != 999)
     {
-      if (alpha_compute_counter < 5)
-      {
-        std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
-        std::cout << "Using alpha: " << dummy_alpha << '\n';
-        alpha = get_alpha(y1, y2, tti, sf_len, socket);
-        alpha_compute_counter++;
-      }
-      else if(alpha_compute_counter == 5) {
-        std::cout << "Alpha compute stopped." << '\n';
-        std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
-        std::cout << "Using alpha: " << dummy_alpha << '\n';
-        alpha_compute_counter++;
-      }
-      else if (alpha_compute_counter == 66)
-      {
-        std::cout << "Using NEW alpha: " << alpha << '\n';
-        alpha_compute_counter = 99;
-      } else {        
-        std::cout << 65-alpha_compute_counter << " seconds remaining" << '\n';
-        std::cout << "Using alpha: " << dummy_alpha << '\n';
-        alpha_compute_counter++;
-      }
+      // if (alpha_compute_counter < 600)
+      // {
+      send_y1y2(y1, y2, tti, sf_len, publisher);
+      alpha = poll_alpha(subscriber, alpha);
+      // }
+      // else if(alpha_compute_counter == 600) {
+      //   std::cout << "Alpha compute stopped." << '\n';
+      //   std::cout << "Using alpha: " << dummy_alpha << '\n';
+      //   alpha_compute_counter = 999;
+      // }
     }
 
     // Apply alpha to UL sample buffer
-    if (alpha_compute_counter == 99) {
+    if (alpha_compute_counter == 999) { 
       buffer.apply_alpha(alpha, sf_len);
     } else {
       buffer.apply_alpha(dummy_alpha, sf_len);
