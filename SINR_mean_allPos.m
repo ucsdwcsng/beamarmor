@@ -53,6 +53,7 @@ x = 1;
 y = [reshape(sinr_avg(1,1,:),[],runs);reshape(sinr_avg(1,2,:),[],runs);...
     reshape(sinr_avg(2,1,:),[],runs);reshape(sinr_avg(2,2,:),[],runs)];
 
+figure;
 boxplot(y')
 % if y1_low_lim < 0
 %   ylim([0, y1_up_lim])
@@ -71,3 +72,7 @@ set(gca, 'xticklabel', {'STJ no BA', 'STJ with BA',...
 grid on
 legend('No Jammer')
 title("Average SINR")
+
+plot_magic(gcf,gca,'aspect_ratio',[4 3],'pixelDensity',200,'lineWidth',2.6,'fontSize',21);
+
+export_fig("/filename",'-png','-pdf','-transparent', gcf)
