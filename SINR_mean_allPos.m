@@ -75,4 +75,4 @@ title("Average SINR")
 
 plot_magic(gcf,gca,'aspect_ratio',[4 3],'pixelDensity',200,'lineWidth',2.6,'fontSize',21);
 
-export_fig("/filename",'-png','-pdf','-transparent', gcf)
+% export_fig("/filename",'-png','-pdf','-transparent', gcf)

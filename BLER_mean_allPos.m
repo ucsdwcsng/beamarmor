@@ -71,3 +71,5 @@ set(gca, 'xticklabel', {'STJ no BA', 'STJ with BA',...
 grid on
 legend('No Jammer')
 title("Average BLER")
+
+plot_magic(gcf,gca,'aspect_ratio',[4 3],'pixelDensity',200,'lineWidth',2.6,'fontSize',21);
