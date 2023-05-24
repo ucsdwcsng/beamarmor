@@ -164,7 +164,7 @@ void txrx::run_thread()
   // ofstream y1_file, y2_file;
   std::complex<double> alpha(0,0);
   std::complex<double> dummy_alpha(0,0);
-  int alpha_compute_counter = 0;
+  int alpha_compute_counter = 999;
 
   // Init ZMQ: It is used to communicate y1 and y2 to an external program
   // which calcualates alpha and returns that value
@@ -279,7 +279,7 @@ void txrx::run_thread()
     cf_t* y2 = buffer.get(1);
 
     // Get alpha from external program every 100 TTI
-    if (tti % 1000 == 0 && alpha_compute_counter != 999)
+    if (tti % 1 == 0 && alpha_compute_counter != 999)
     {
       // if (alpha_compute_counter < 600)
       // {
