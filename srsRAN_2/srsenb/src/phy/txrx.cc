@@ -96,7 +96,7 @@ void send_y1y2(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t&
   // std::cout << "get alpha called" << '\n';
   
   // Send y1 and y2 via ZMQ:
-  int size = 4 * sf_len / 100;
+  int size = (int)sf_len/10;
   // Serialize the samples data using MessagePack
   msgpack::sbuffer buffer;
   msgpack::packer<msgpack::sbuffer> packer(&buffer);
@@ -104,17 +104,17 @@ void send_y1y2(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t&
   packer.pack_array(size);
 
   // Pack each sample's real and imaginary part
-  for (int i = 0; i < (int)sf_len; i += 100) {
+  for (int i = 0; i < (int)sf_len; i += 40) {
     std::complex<double> y1_sample = (std::complex<double>)y1[i];
     std::complex<double> y2_sample = (std::complex<double>)y2[i];
-    // packer.pack_double(std::floor(y1_sample.real() * 10e5) / 10e5);
-    // packer.pack_double(std::floor(y1_sample.imag() * 10e5) / 10e5);
-    // packer.pack_double(std::floor(y2_sample.real() * 10e5) / 10e5);
-    // packer.pack_double(std::floor(y2_sample.imag() * 10e5) / 10e5);
-    packer.pack_double(std::floor(y1_sample.real() * 10) / 10);
-    packer.pack_double(std::floor(y1_sample.imag() * 10) / 10);
-    packer.pack_double(std::floor(y2_sample.real() * 10) / 10);
-    packer.pack_double(std::floor(y2_sample.imag() * 10) / 10);
+    packer.pack_double(std::floor(y1_sample.real() * 10e5) / 10e5);
+    packer.pack_double(std::floor(y1_sample.imag() * 10e5) / 10e5);
+    packer.pack_double(std::floor(y2_sample.real() * 10e5) / 10e5);
+    packer.pack_double(std::floor(y2_sample.imag() * 10e5) / 10e5);
+    // packer.pack_double(std::floor(y1_sample.real() * 10) / 10);
+    // packer.pack_double(std::floor(y1_sample.imag() * 10) / 10);
+    // packer.pack_double(std::floor(y2_sample.real() * 10) / 10);
+    // packer.pack_double(std::floor(y2_sample.imag() * 10) / 10);
   }
 
   // std::cout << "Set ZMQ message" << "; TTI: " << tti << '\n';
@@ -279,7 +279,7 @@ void txrx::run_thread()
     cf_t* y2 = buffer.get(1);
 
     // Get alpha from external program every 100 TTI
-    if (tti % 1 == 0 && alpha_compute_counter != 999)
+    if (tti % 30 == 0 && alpha_compute_counter != 999)
     {
       // if (alpha_compute_counter < 600)
       // {
