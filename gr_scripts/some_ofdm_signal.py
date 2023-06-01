@@ -90,7 +90,7 @@ class some_ofdm_signal(gr.top_block, Qt.QWidget):
             '',
         )
         self.uhd_usrp_sink_0.set_center_freq(2.56e9, 0)
-        self.uhd_usrp_sink_0.set_gain(30, 0)
+        self.uhd_usrp_sink_0.set_gain(50, 0)
         self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
         self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
         self.uhd_usrp_sink_0.set_time_unknown_pps(uhd.time_spec())
