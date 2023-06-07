@@ -1,32 +1,22 @@
 clear;
 
-sinr_avg = zeros(2,7);
+nof_db_values = 7;
+db_values = [0,5,10,15,20,25,30];
+nof_gain_pairs = 1;
+sinr_avg = zeros(nof_gain_pairs,nof_db_values);
 
-for i = 1:2
-    file_name = "sinrVSjammerPower/";
+for i = 1:nof_gain_pairs
+    file_name = "sinrVSjammerPower/Setup2/";
     switch i
         case 1
-            sub_file_name = file_name+"UE_3and3dBTXandRXgain/";
-        case 2
-            sub_file_name = file_name+"UE_10and10dBTXandRXgain/";
+            sub_file_name = file_name+"UE_12and12dBTXandRXgain/";
+%         case 1
+%             sub_file_name = file_name+"UE_3and3dBTXandRXgain/";
+%         case 2
+%             sub_file_name = file_name+"UE_10and10dBTXandRXgain/";
     end
-    for j = 1:7
-        switch j
-            case 1
-                sub2_file_name = sub_file_name+"0dB";
-            case 2
-                sub2_file_name = sub_file_name+"6dB";
-            case 3
-                sub2_file_name = sub_file_name+"12dB";
-            case 4
-                sub2_file_name = sub_file_name+"18dB";
-            case 5
-                sub2_file_name = sub_file_name+"24dB";
-            case 6
-                sub2_file_name = sub_file_name+"30dB";
-            case 7
-                sub2_file_name = sub_file_name+"31_5dB";
-        end    
+    for j = 1:nof_db_values
+        sub2_file_name = sub_file_name+num2str(db_values(j))+"dB";
     
         A = readmatrix(sub2_file_name);
         len_t = length(A)/3;
@@ -39,19 +29,25 @@ for i = 1:2
     end
 end
     
-y_up_lim = round(max(max(sinr_avg))+1);
+y_up_lim = round(max(max(sinr_avg))+2);
 
-plot(sinr_avg(1,:))
-hold on
-plot(sinr_avg(2,:))
+plot((1:1:nof_db_values),sinr_avg)
+% hold on
+% plot(sinr_avg(2,:))
 
 xlabel("Jammer power in dB")
-xticklabels({'0 dB','6 dB','12 dB','18 dB','24 dB','30 dB','31.5 dB'})
-xlim([1 7])
-ylim([0, y_up_lim])
+% xticklabels({'0 dB','6 dB','12 dB','18 dB','24 dB','30 dB','31.5 dB'})
+xticks(1:1:nof_db_values)
+xticklabels({'0','5','10','15','20','25','30'})
+xlim([1 nof_db_values])
+ylim([0 y_up_lim])
 yticks(0:y_up_lim)
 ylabel('SINR in dB')
 grid on
-legend('UE 3dB TX and RX Gain','UE 10dB TX and RX Gain')
+% legend('UE 3dB TX and RX Gain','UE 10dB TX and RX Gain')
+legend('UE 12 dB TX and RX Gain')
+% title('UL SINR at basestation')
 
 plot_magic(gcf,gca,'aspect_ratio',[4 3],'pixelDensity',200,'lineWidth',2.6,'fontSize',21);
+% Export the figure as a PDF with a transparent background
+exportgraphics(gcf, 'figure.pdf', 'ContentType', 'vector', 'BackgroundColor', 'none');

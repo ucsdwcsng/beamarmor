@@ -103,6 +103,11 @@ void send_y1y2(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t&
   // Pack the size of the sent samples first
   packer.pack_array(size);
 
+  // // Debug: Verify y1 and y2 - compare to MIMO-RIC received y1 and y2
+  // std::cout << "------------------" << '\n';
+  // std::cout << "y1[0]: " << (std::complex<double>)y1[0] << '\n';
+  // std::cout << "y2[0]: " << (std::complex<double>)y2[0] << '\n';
+
   // Pack each sample's real and imaginary part
   for (int i = 0; i < (int)sf_len; i += 40) {
     std::complex<double> y1_sample = (std::complex<double>)y1[i];
@@ -279,12 +284,17 @@ void txrx::run_thread()
     cf_t* y2 = buffer.get(1);
 
     // Get alpha from external program every 100 TTI
-    if (tti % 30 == 0 && alpha_compute_counter != 999)
+    if (tti % 50 == 0 && alpha_compute_counter != 999)
     {
-      // if (alpha_compute_counter < 600)
-      // {
-      send_y1y2(y1, y2, tti, sf_len, publisher);
-      alpha = poll_alpha(subscriber, alpha);
+      if (alpha_compute_counter < 400)
+      {
+        std::cout << "UE attachment countdown: " << 20-alpha_compute_counter/20 << '\n';
+        alpha_compute_counter++;
+      }
+      else {
+        send_y1y2(y1, y2, tti, sf_len, publisher);
+        alpha = poll_alpha(subscriber, alpha);
+      }
       // }
       // else if(alpha_compute_counter == 600) {
       //   std::cout << "Alpha compute stopped." << '\n';
