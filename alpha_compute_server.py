@@ -27,8 +27,8 @@ def save_y1y2_file(y1y2,i):
     y2 = np.array(y1y2[2::4], dtype=complex) + 1j*np.array(y1y2[3::4], dtype=complex)
 
     # Save y1 and y2 to file
-    np.savetxt('y1y2_milcom/Setup2/ueOFF/jammer30dB/y1_'+str(i)+'.txt', y1, delimiter=',')
-    np.savetxt('y1y2_milcom/Setup2/ueOFF/jammer30dB/y2_'+str(i)+'.txt', y2, delimiter=',')
+    np.savetxt('y1y2_milcom/Setup2/ueOFF/singleToneJammer/jammer30dB/y1_'+str(i)+'.txt', y1, delimiter=',')
+    np.savetxt('y1y2_milcom/Setup2/ueOFF/singleToneJammer/jammer30dB/y2_'+str(i)+'.txt', y2, delimiter=',')
     print("y1y2 file saved")
 
 def print_y1y2(y1y2):

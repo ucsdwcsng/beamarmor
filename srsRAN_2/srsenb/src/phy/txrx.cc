@@ -169,7 +169,7 @@ void txrx::run_thread()
   // ofstream y1_file, y2_file;
   std::complex<double> alpha(0,0);
   std::complex<double> dummy_alpha(0,0);
-  int alpha_compute_counter = 999;
+  int alpha_compute_counter = 0;
 
   // Init ZMQ: It is used to communicate y1 and y2 to an external program
   // which calcualates alpha and returns that value
@@ -286,20 +286,14 @@ void txrx::run_thread()
     // Get alpha from external program every 100 TTI
     if (tti % 50 == 0 && alpha_compute_counter != 999)
     {
-      if (alpha_compute_counter < 400)
-      {
-        std::cout << "UE attachment countdown: " << 20-alpha_compute_counter/20 << '\n';
-        alpha_compute_counter++;
-      }
-      else {
+      // if (alpha_compute_counter < 400)
+      // {
+      //   std::cout << "UE attachment countdown: " << 20-alpha_compute_counter/20 << '\n';
+      //   alpha_compute_counter++;
+      // }
+      // else {
         send_y1y2(y1, y2, tti, sf_len, publisher);
         alpha = poll_alpha(subscriber, alpha);
-      }
-      // }
-      // else if(alpha_compute_counter == 600) {
-      //   std::cout << "Alpha compute stopped." << '\n';
-      //   std::cout << "Using alpha: " << dummy_alpha << '\n';
-      //   alpha_compute_counter = 999;
       // }
     }
 
