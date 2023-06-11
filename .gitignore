@@ -1,2 +1,6 @@
 .vscode
 srsRAN_2/build/
+*.pdf
+*.png
+*.jpg
+*.iq
