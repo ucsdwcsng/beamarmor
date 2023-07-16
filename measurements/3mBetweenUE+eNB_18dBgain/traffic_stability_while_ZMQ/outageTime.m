@@ -63,13 +63,14 @@ ylim([0 50])
 yticks(0:5:50)
 ylabel('Outage time in %')
 grid on
-set(gca, 'xticklabel', {'No ZMQ Comm', '1 in 1000 TII','1 in 100 TTI','1 in 10 TTI','1 in 5 TTI'})
+set(gca, 'xticklabel', {'No ZMQ Comm', '1 in 1000 TTI','1 in 100 TTI','1 in 10 TTI','1 in 5 TTI'})
 % set(gca, 'xticklabel', {'No ZMQ Comm', '1 in 100 TTIs, no DS',...
 %     '1 in 10 TTIs, 10x DS', '1 in 5 TTIs, 100x DS'})
 % set(gca, 'xticklabel', {'No ZMQ Comm','1 in 10 TTIs, 10x DS',...
 %     '1 in 5 TTIs, 100x DS','Every TTI, 1000x DS'})
-title('Amount of radio-link failure time')
+%title('Amount of radio-link failure time')
 % title('SINR for various ZMQ comm. periodicities')
 
-plot_magic(gcf,gca,'aspect_ratio',[4 3],'pixelDensity',200,'lineWidth',2.6,'fontSize',21);
-export_fig("outage",'-png','-pdf','-transparent', gcf)
+plot_magic(gcf,gca,'aspect_ratio',[4 3],'pixelDensity',200,'lineWidth',2.6,'fontSize',16);
+exportgraphics(gcf, 'figure.pdf', 'ContentType', 'vector', 'BackgroundColor', 'none');
+%export_fig("outage",'-png','-pdf','-transparent', gcf)

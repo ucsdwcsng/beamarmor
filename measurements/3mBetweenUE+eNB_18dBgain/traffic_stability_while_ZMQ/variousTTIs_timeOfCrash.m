@@ -82,10 +82,10 @@ xlabel('time in seconds')
 xticks(0:5:80)
 ylim([0 5])
 yticks(0.5:1:4.5)
-yticklabels({'No ZMQ Comm', '1 in 1000 TII','1 in 100 TTI','1 in 10 TTI','1 in 5 TTI'})
+yticklabels({'No ZMQ Comm', '1 in 1000 TTI','1 in 100 TTI','1 in 10 TTI','1 in 5 TTI'})
 grid on
 legend('Run 1','Run 2','Run 3','Run 4','Run 5')
-title('Radio-link failure occurrences')
+% title('Radio-link failure occurrences')
 
-plot_magic(gcf,gca,'aspect_ratio',[4 3],'pixelDensity',200,'lineWidth',2.6,'fontSize',21);
-export_fig("crash_events",'-png','-pdf','-transparent', gcf)
+plot_magic(gcf,gca,'aspect_ratio',[4 3],'pixelDensity',200,'lineWidth',2.6,'fontSize',16);
+exportgraphics(gcf, 'figure.pdf', 'ContentType', 'vector', 'BackgroundColor', 'none');
