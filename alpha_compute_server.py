@@ -4,14 +4,8 @@ import zmq
 import numpy as np
 import msgpack
 
+# Computes alpha for BeamArmor's anti-jamming
 def compute_alpha(y1y2):
-    # Transform y1y2 list of doubles holfing real and imag parts into np vectors
-    # y_len = int(len(y1y2)/4)
-    # y1 = np.empty((y_len,), dtype=complex)
-    # y2 = np.empty((y_len,), dtype=complex)
-    # for i in range(y_len):
-    #     y1[i] = complex(y1y2[i*4], y1y2[i*4+1])
-    #     y2[i] = complex(y1y2[i*4+2], y1y2[i*4+3])
     y1 = np.array(y1y2[::4], dtype=complex) + 1j*np.array(y1y2[1::4], dtype=complex)
     y2 = np.array(y1y2[2::4], dtype=complex) + 1j*np.array(y1y2[3::4], dtype=complex)
 
@@ -22,13 +16,14 @@ def compute_alpha(y1y2):
     # Return alpha
     return alpha
 
+# Saves y1 and y2 received from the RAN/srsenb to a file
 def save_y1y2_file(y1y2,i):
     y1 = np.array(y1y2[::4], dtype=complex) + 1j*np.array(y1y2[1::4], dtype=complex)
     y2 = np.array(y1y2[2::4], dtype=complex) + 1j*np.array(y1y2[3::4], dtype=complex)
 
     # Save y1 and y2 to file
-    np.savetxt('y1y2_milcom/Setup2/ueOFF/singleToneJammer/jammer30dB/y1_'+str(i)+'.txt', y1, delimiter=',')
-    np.savetxt('y1y2_milcom/Setup2/ueOFF/singleToneJammer/jammer30dB/y2_'+str(i)+'.txt', y2, delimiter=',')
+    np.savetxt('y1_'+str(i)+'.txt', y1, delimiter=',')
+    np.savetxt('y2_'+str(i)+'.txt', y2, delimiter=',')
     print("y1y2 file saved")
 
 def print_y1y2(y1y2):
@@ -43,7 +38,6 @@ if __name__ == "__main__":
 
     context = zmq.Context()
     subscriber_socket = context.socket(zmq.SUB)
-    # subscriber_socket.setsockopt(zmq.SUBSCRIBE, b"")
     subscriber_socket.setsockopt_string(zmq.SUBSCRIBE, "")
     subscriber_socket.connect("tcp://localhost:5555")
     
@@ -73,18 +67,16 @@ if __name__ == "__main__":
 
             # Process the received message
             data = msgpack.unpackb(message)
-
+            
+            # Compute alpha for BeamArmor's anti-jamming
             # alpha = compute_alpha(data)
             
-            # Saving y1 and y2 to file
-            if i < 100:
-                save_y1y2_file(data,i)
-                i = i+1
-            else:
-                exit()
-
-            # # Printing y1[0] and y2[0]
-            # print_y1y2(data)
+            # Saving 100 pairs of y1 and y2 to file
+            # if i < 100:
+            #     save_y1y2_file(data,i)
+            #     i = i+1
+            # else:
+            #     exit()
 
             # Sending dummy alpha immediatley
             alpha = 0
@@ -92,6 +84,3 @@ if __name__ == "__main__":
             # Return alpha to srseNB
             alpha_msg = msgpack.packb([alpha.real, alpha.imag])
             publisher_socket.send(alpha_msg)
-            # print("Sleeping 2 sec")
-            # sleep(2)
-            # socket.send_string("ACK")
