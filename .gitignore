@@ -5,3 +5,4 @@ srsRAN_2/build/
 *.jpg
 *.iq
 *.asv
+srsRAN/build/
