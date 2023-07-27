@@ -91,10 +91,11 @@ void txrx::stop()
   }
 }
 
+/*
+RAN to MIMO-RIC 
+*/
 void send_y1y2(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t& publisher)
-{
-  // std::cout << "get alpha called" << '\n';
-  
+{  
   // Send y1 and y2 via ZMQ:
   int size = (int)sf_len/10;
   // Serialize the samples data using MessagePack
@@ -103,7 +104,7 @@ void send_y1y2(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t&
   // Pack the size of the sent samples first
   packer.pack_array(size);
 
-  // // Debug: Verify y1 and y2 - compare to MIMO-RIC received y1 and y2
+  // Debug: Verify y1 and y2 - compare to MIMO-RIC received y1 and y2
   // std::cout << "------------------" << '\n';
   // std::cout << "y1[0]: " << (std::complex<double>)y1[0] << '\n';
   // std::cout << "y2[0]: " << (std::complex<double>)y2[0] << '\n';
@@ -116,19 +117,15 @@ void send_y1y2(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t&
     packer.pack_double(std::floor(y1_sample.imag() * 10e5) / 10e5);
     packer.pack_double(std::floor(y2_sample.real() * 10e5) / 10e5);
     packer.pack_double(std::floor(y2_sample.imag() * 10e5) / 10e5);
-    // packer.pack_double(std::floor(y1_sample.real() * 10) / 10);
-    // packer.pack_double(std::floor(y1_sample.imag() * 10) / 10);
-    // packer.pack_double(std::floor(y2_sample.real() * 10) / 10);
-    // packer.pack_double(std::floor(y2_sample.imag() * 10) / 10);
   }
 
-  // std::cout << "Set ZMQ message" << "; TTI: " << tti << '\n';
   zmq::message_t y_msg(buffer.data(), buffer.size(), nullptr);
   publisher.send(y_msg, zmq::send_flags::none);
-  // std::cout << "Sent y1y2 from socket" << '\n';
-
 }
 
+/*
+MIMO-RIC to RAN
+*/
 std::complex<double> poll_alpha(zmq::socket_t& subscriber, std::complex<double> prev_alpha) {
   // Create a poll item for the ZMQ socket
   zmq_pollitem_t poll_items[] = { { subscriber, 0, ZMQ_POLLIN, 0 } };
@@ -153,7 +150,7 @@ std::complex<double> poll_alpha(zmq::socket_t& subscriber, std::complex<double> 
 
     return alpha;
   } else {
-    // No message received within the timeout period, retunrn previous alpha
+    // No message received within the timeout period, return previous alpha
     // std::cout << "No reply received" << '\n';
     return prev_alpha;
   }
@@ -164,15 +161,16 @@ void txrx::run_thread()
   srsran::rf_buffer_t    buffer    = {};
   srsran::rf_timestamp_t timestamp = {};
   uint32_t               sf_len    = SRSRAN_SF_LEN_PRB(worker_com->get_nof_prb(0));
-  // Needed when y1 and y2 are written to file for 100 consecutive TTIs:
-  // string tti_mod100 = "";
-  // ofstream y1_file, y2_file;
+  /*
+  alpha and dummy_alpha are the control information variable related to MIMO-RIC.
+  alpha is set by the poll_alpha function to a value recevied from the controller.
+  */
   std::complex<double> alpha(0,0);
   std::complex<double> dummy_alpha(0,0);
-  int alpha_compute_counter = 0;
-
-  // Init ZMQ: It is used to communicate y1 and y2 to an external program
-  // which calcualates alpha and returns that value
+  /*
+  Init ZMQ: It is used to communicate y1 and y2 to the MIMO-RIC
+  which computes some alpha and returns that value
+  */
   zmq::context_t context_sub(1);
   zmq::context_t context_pub(1);
   zmq::socket_t subscriber(context_sub, ZMQ_SUB);
@@ -180,6 +178,13 @@ void txrx::run_thread()
   subscriber.connect("tcp://localhost:5556");
   subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
   publisher.bind("tcp://*:5555");
+  /*
+  Boolean variables to decide if:
+  - to use MIMO-RIC
+  - to apply alpha for BeamArmor's anti-jamming
+  */
+  bool mimo_ric_on = false;
+  bool beam_armor_on = true;
 
   float samp_rate = srsran_sampling_freq_hz(worker_com->get_nof_prb(0));
 
@@ -277,48 +282,29 @@ void txrx::run_thread()
     buffer.set_nof_samples(sf_len);
     radio_h->rx_now(buffer, timestamp);
 
-    // NullSteer:
-    // Get raw y1 and y2
-    // std::cout << "Get raw y1 and y2" << '\n';
-    cf_t* y1 = buffer.get(0);
-    cf_t* y2 = buffer.get(1);
+    if (mimo_ric_on) {
+      /*
+      Get y1 and y2 for MIMO-RIC (IQ samples of RX antenna ports 1 and 2)
+      */
+      cf_t* y1 = buffer.get(0);
+      cf_t* y2 = buffer.get(1);
 
-    // Get alpha from external program every 100 TTI
-    if (tti % 50 == 0 && alpha_compute_counter != 999)
-    {
-      // if (alpha_compute_counter < 400)
-      // {
-      //   std::cout << "UE attachment countdown: " << 20-alpha_compute_counter/20 << '\n';
-      //   alpha_compute_counter++;
-      // }
-      // else {
+      /*
+      Main code snippet that executes MIMO-RIC communication
+      */
+      if (tti % 50 == 0)
+      {
         send_y1y2(y1, y2, tti, sf_len, publisher);
         alpha = poll_alpha(subscriber, alpha);
-      // }
+      }
+
+      /*
+      Apply alpha to UL sample buffer to perform BeamArmor's anti-jamming
+      */
+      if (beam_armor_on) {
+        buffer.apply_alpha(alpha, sf_len);
+      }
     }
-
-    // Apply alpha to UL sample buffer
-    if (alpha_compute_counter == 999) { 
-      buffer.apply_alpha(alpha, sf_len);
-    } else {
-      buffer.apply_alpha(dummy_alpha, sf_len);
-    }
-
-    // cf_t* tmp = lte_worker->get_buffer_rx(0, 0);
-    // printf("signal_buffer_rx[0][0]: %f+%fi\n", __real__ tmp[0], __imag__ tmp[0]);
-    // std::cout << "signal_buffer_rx[0] addr: " << tmp << '\n';
-    // std::cout << "-----------------------" << '\n';
-
-    // // Write y1 and y2 to file
-    // tti_mod100 = std::to_string(tti % 100);
-    // y1_file.open("../../y1y2_for_100TTIs/y1_"+tti_mod100+".txt");
-    // y2_file.open("../../y1y2_for_100TTIs/y2_"+tti_mod100+".txt");
-    // for (uint32_t i = 0; i < sf_len; i++) {
-    //   y1_file << (std::complex<double>)y1[i] << '\n';
-    //   y2_file << (std::complex<double>)y2[i] << '\n';
-    // }
-    // y1_file.close();
-    // y2_file.close();
 
     if (ul_channel) {
       ul_channel->run(buffer.to_cf_t(), buffer.to_cf_t(), sf_len, timestamp.get(0));
