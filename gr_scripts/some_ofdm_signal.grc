@@ -80,6 +80,18 @@ blocks:
     coordinate: [504, 20.0]
     rotation: 0
     state: enabled
+- name: tx_gain
+  id: variable
+  parameters:
+    comment: ''
+    value: '30'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [648, 20.0]
+    rotation: 0
+    state: enabled
 - name: blocks_file_source_0
   id: blocks_file_source
   parameters:
@@ -87,7 +99,7 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: /mnt/ramdisk/uhd_ofdm_tx.dat
+    file: /mnt/ramdisk/ofdm_tx.iq
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -282,7 +294,7 @@ blocks:
     comment: ''
     dev_addr: '""'
     dev_args: '""'
-    gain0: '50'
+    gain0: tx_gain
     gain1: '0'
     gain10: '0'
     gain11: '0'

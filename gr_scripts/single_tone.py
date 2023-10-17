@@ -71,8 +71,9 @@ class single_tone(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
+        self.tx_gain = tx_gain = 30
         self.samp_rate = samp_rate = 10e6
-        self.cent_freq = cent_freq = 2.68e9
+        self.cent_freq = cent_freq = 2.56e9
 
         ##################################################
         # Blocks
@@ -82,21 +83,16 @@ class single_tone(gr.top_block, Qt.QWidget):
             uhd.stream_args(
                 cpu_format="fc32",
                 args='',
-                channels=list(range(0,2)),
+                channels=list(range(0,1)),
             ),
             '',
         )
         self.uhd_usrp_sink_0.set_subdev_spec('A:0 B:0', 0)
         self.uhd_usrp_sink_0.set_center_freq(cent_freq, 0)
-        self.uhd_usrp_sink_0.set_gain(10, 0)
+        self.uhd_usrp_sink_0.set_gain(tx_gain, 0)
         self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
-        self.uhd_usrp_sink_0.set_center_freq(cent_freq, 1)
-        self.uhd_usrp_sink_0.set_gain(10, 1)
-        self.uhd_usrp_sink_0.set_antenna('TX/RX', 1)
         self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
         self.uhd_usrp_sink_0.set_time_unknown_pps(uhd.time_spec())
-        self.blocks_file_source_0_0 = blocks.file_source(gr.sizeof_gr_complex*1, '/tmp/tx_data2.iq', True, 0, 0)
-        self.blocks_file_source_0_0.set_begin_tag(pmt.PMT_NIL)
         self.blocks_file_source_0 = blocks.file_source(gr.sizeof_gr_complex*1, '/tmp/tx_data1.iq', True, 0, 0)
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
 
@@ -105,13 +101,19 @@ class single_tone(gr.top_block, Qt.QWidget):
         # Connections
         ##################################################
         self.connect((self.blocks_file_source_0, 0), (self.uhd_usrp_sink_0, 0))
-        self.connect((self.blocks_file_source_0_0, 0), (self.uhd_usrp_sink_0, 1))
 
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "single_tone")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
+
+    def get_tx_gain(self):
+        return self.tx_gain
+
+    def set_tx_gain(self, tx_gain):
+        self.tx_gain = tx_gain
+        self.uhd_usrp_sink_0.set_gain(self.tx_gain, 0)
 
     def get_samp_rate(self):
         return self.samp_rate

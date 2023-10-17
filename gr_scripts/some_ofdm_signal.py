@@ -22,7 +22,7 @@ if __name__ == '__main__':
             print("Warning: failed to XInitThreads()")
 
 from gnuradio import blocks
-from gnuradio import digital
+import pmt
 from gnuradio import gr
 from gnuradio.filter import firdes
 import sys
@@ -72,6 +72,7 @@ class some_ofdm_signal(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
+        self.tx_gain = tx_gain = 30
         self.samp_rate = samp_rate = 5e6
         self.packet_len = packet_len = 50
         self.len_tag_key = len_tag_key = "packet_len"
@@ -90,40 +91,31 @@ class some_ofdm_signal(gr.top_block, Qt.QWidget):
             '',
         )
         self.uhd_usrp_sink_0.set_center_freq(2.56e9, 0)
-        self.uhd_usrp_sink_0.set_gain(50, 0)
+        self.uhd_usrp_sink_0.set_gain(tx_gain, 0)
         self.uhd_usrp_sink_0.set_antenna('TX/RX', 0)
         self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
         self.uhd_usrp_sink_0.set_time_unknown_pps(uhd.time_spec())
-        self.digital_ofdm_tx_0 = digital.ofdm_tx(
-            fft_len=fft_len,
-            cp_len=fft_len//4,
-            packet_length_tag_key=len_tag_key,
-            occupied_carriers=((-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30),),
-            pilot_carriers=((-32,-31,31,32),),
-            pilot_symbols=((-1,1,-1,1),),
-            sync_word1=None,
-            sync_word2=None,
-            bps_header=1,
-            bps_payload=2,
-            rolloff=0,
-            debug_log=False,
-            scramble_bits=False)
-        self.blocks_vector_source_x_0 = blocks.vector_source_b(range(packet_len), True, 1, ())
-        self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, packet_len, len_tag_key)
+        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_gr_complex*1, '/mnt/ramdisk/ofdm_tx.iq', True, 0, 0)
+        self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_ofdm_tx_0, 0))
-        self.connect((self.blocks_vector_source_x_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
-        self.connect((self.digital_ofdm_tx_0, 0), (self.uhd_usrp_sink_0, 0))
+        self.connect((self.blocks_file_source_0, 0), (self.uhd_usrp_sink_0, 0))
 
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "some_ofdm_signal")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
+
+    def get_tx_gain(self):
+        return self.tx_gain
+
+    def set_tx_gain(self, tx_gain):
+        self.tx_gain = tx_gain
+        self.uhd_usrp_sink_0.set_gain(self.tx_gain, 0)
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -137,9 +129,6 @@ class some_ofdm_signal(gr.top_block, Qt.QWidget):
 
     def set_packet_len(self, packet_len):
         self.packet_len = packet_len
-        self.blocks_stream_to_tagged_stream_0.set_packet_len(self.packet_len)
-        self.blocks_stream_to_tagged_stream_0.set_packet_len_pmt(self.packet_len)
-        self.blocks_vector_source_x_0.set_data(range(self.packet_len), ())
 
     def get_len_tag_key(self):
         return self.len_tag_key
