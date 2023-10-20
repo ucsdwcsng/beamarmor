@@ -23,6 +23,8 @@ To change the periodicity, look for the function calls 'send_y1y2' and 'poll_alp
 The MIMO-RIC logic includes sending the IQ samples recevied by antenna ports 1 and 2 of the srsenb to the controller. The down-sampling rate of these IQ samples can be adjusted inside the 'send_y1y2' function in /srsRAN/srsenb/src/phy/txrx.cc. To do so, adjust the increment value of the for-loop 'for (int i = 0; i < (int)sf_len; i += 40). Currently, the down-sampling rate is 40x. When adjusting the down-sampling rate, the variable 'int size = (int)sf_len/10;' must be adjusted accordingly.
 
 ## BeamArmor Demo - Best Practice
-For demonstartion purposes, we recommend to add a timer element of e.g. 30 sec. into the source code and follow these steps:
+For demonstartion purposes, we recommend to add two timer elemens of e.g. 10 and 30 sec. into the source code and follow these steps:
 1. The timer starts and the MIMO-RIC platform begins to regularly extract and send y1 and y2 to the controller. The controller will compute alpha and send the value back to the RAN stack, where it is not yet applied.
-2. After alpha has been computed at least once (usually I wait for about 3-5 times to view and compare the output on the console), implement in the source code logic that stops the y1y2_send operation and simply keep the latest computed alpha value. Start the UE, await attachement of 
+2. After the first timer has elapsed, implement logic in txrx.cc that stops the y1y2_send operation and simply keeps the latest computed alpha value.
+3. Start the UE, await attachement, and start UL traffic. When observing the traffic metrics on the console at this point, the jammer influence should be visible through bad SINR, BLER, and throughput.
+4. After the second timer has elapsed, implement logic that starts applying the latest alpha value to the UL processing. Now, a impromvemet in the metrics should be visible and thus verifying BeamArmors nulling effect.
