@@ -21,3 +21,8 @@ Execute the Python script inside a 3rd terminal to run the controller by executi
 ## Parameters of MIMO-RIC
 To change the periodicity, look for the function calls 'send_y1y2' and 'poll_alpha' inside the run_thread() method (txrx.cc), and set the if-condition 'if (tti % 50 == 0)' to any value you prefer instead of every 50 TTI.
 The MIMO-RIC logic includes sending the IQ samples recevied by antenna ports 1 and 2 of the srsenb to the controller. The down-sampling rate of these IQ samples can be adjusted inside the 'send_y1y2' function in /srsRAN/srsenb/src/phy/txrx.cc. To do so, adjust the increment value of the for-loop 'for (int i = 0; i < (int)sf_len; i += 40). Currently, the down-sampling rate is 40x. When adjusting the down-sampling rate, the variable 'int size = (int)sf_len/10;' must be adjusted accordingly.
+
+## BeamArmor Demo - Best Practice
+For demonstartion purposes, we recommend to add a timer element of e.g. 30 sec. into the source code and follow these steps:
+1. The timer starts and the MIMO-RIC platform begins to regularly extract and send y1 and y2 to the controller. The controller will compute alpha and send the value back to the RAN stack, where it is not yet applied.
+2. After alpha has been computed at least once (usually I wait for about 3-5 times to view and compare the output on the console), implement in the source code logic that stops the y1y2_send operation and simply keep the latest computed alpha value. Start the UE, await attachement of 
