@@ -5,7 +5,7 @@ It contains an O-RAN driven RIC named MIMO-RIC that is specifically geared towar
 One of these Apps is BeamArmor, which is included in this repo. BeamArmor is a null-steering enabled anti-jamming application that can mitigate the interference effect of jamming signals in UL traffic.
 
 ## Installing the repo
-Installation is done by building srsRAN in the default manner. Create a build directory inside srsRAN, run cmake ../ and make inside the build directory. The default configuration file enb.conf can be installed from the srsRAN/build/ directory by executing 'srsran_install_configs.sh'.
+Installation is done by building srsRAN in the default manner. Create a build directory inside srsRAN, run cmake ../ and make inside the build directory. cmake might output missing modules like for example, msgpack, that have to be installed first before running make. The default configuration file enb.conf can be installed from the srsRAN/build/ directory by executing 'srsran_install_configs.sh'.
 
 ## Preparing BeamArmor and MIMO-RIC
 Before running the srsRAN base station with MIMO-RIC and BeamArmor, the operation mode of the srsenb must be set to MIMO and the number of ports must be specified. Set tm = 4 and nof_ports = 2 inside the [enb] paragraph of enb.conf (usually installed in home/.config/srsran/).
