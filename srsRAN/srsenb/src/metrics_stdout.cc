@@ -142,6 +142,8 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
     float pusch_sinr = (is_nr) ? mac.ues[i].pusch_sinr : phy[i].ul.pusch_sinr;
     if (not isnan(pusch_sinr) and not iszero(pusch_sinr)) {
       fmt::print(" {:>5.1f}", clamp_sinr(pusch_sinr));
+      // BeamArmor GUI
+      sinr = clamp_sinr(pusch_sinr);
       // Write SINR to file
       if (outfile.is_open()) {
         outfile << clamp_sinr(pusch_sinr) << ",";
@@ -172,6 +174,8 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
     }
     if (mac.ues[i].rx_brate > 0) {
       fmt::print(" {:>6.6}", float_to_eng_string((float)mac.ues[i].rx_brate / (mac.ues[i].nof_tti * 1e-3), 1));
+      // BeamArmor GUI
+      throughput = (float)mac.ues[i].rx_brate / (mac.ues[i].nof_tti * 1e-3);
       // Write brate to file
       if (outfile.is_open()) {
         outfile << (float)mac.ues[i].rx_brate / (mac.ues[i].nof_tti * 1e-3) << ",";
@@ -187,6 +191,8 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
 
     if (mac.ues[i].rx_pkts > 0 && mac.ues[i].rx_errors > 0) {
       fmt::print(" {:>3}%", int((float)100 * mac.ues[i].rx_errors / mac.ues[i].rx_pkts));
+      // BeamArmor GUI
+      bler = int((float)100 * mac.ues[i].rx_errors / mac.ues[i].rx_pkts);
       // Write BLER to file
       if (outfile.is_open()) {
         outfile << int((float)100 * mac.ues[i].rx_errors / mac.ues[i].rx_pkts) << ",";
