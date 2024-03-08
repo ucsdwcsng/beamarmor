@@ -150,6 +150,8 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
       }
     } else {
       fmt::print(" {:>5.5}", "n/a");
+      // BeamArmor GUI
+      sinr = 0;
       if (outfile.is_open()) {
         outfile << "n/a,";
       }
@@ -182,6 +184,8 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
       }
     } else {
       fmt::print(" {:>6}", 0);
+      // BeamArmor GUI
+      throughput = 0;
       if (outfile.is_open()) {
         outfile << 0 << ",";
       }
@@ -199,6 +203,8 @@ void metrics_stdout::set_metrics_helper(uint32_t                          num_ue
       }
     } else {
       fmt::print(" {:>3}%", 0);
+      // BeamArmor GUI
+      bler = 0;
       if (outfile.is_open()) {
         outfile << 0 << ",";
       }

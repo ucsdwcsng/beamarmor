@@ -49,6 +49,7 @@
 #include "srsran/common/enb_events.h"
 
 // BeamArmor GUI
+#include <X11/Xlib.h> 
 #include "srsenb/hdr/beamArmorGUI.h"
 double bler = 0.0;
 double sinr = 0.0;
@@ -616,6 +617,9 @@ int main(int argc, char* argv[])
   metrics_stdout                     metrics_screen;
 
   cout << "---  Software Radio Systems LTE eNodeB  ---" << endl << endl;
+  
+  // BeamArmor GUI
+  XInitThreads();
 
   srsran_debug_handle_crash(argc, argv);
   parse_args(&args, argc, argv);

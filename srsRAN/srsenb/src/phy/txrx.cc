@@ -121,12 +121,13 @@ void send_y1y2(cf_t* y1, cf_t* y2, uint32_t tti, uint32_t sf_len, zmq::socket_t&
 
   zmq::message_t y_msg(buffer.data(), buffer.size(), nullptr);
   publisher.send(y_msg, zmq::send_flags::none);
+  // std::cout << "y1y2 sent..." << "\n";
 }
 
 /*
 MIMO-RIC to RAN
 */
-std::complex<double> poll_alpha(zmq::socket_t& subscriber, std::complex<double> prev_alpha) {
+std::complex<double> poll_alpha(zmq::socket_t& subscriber, std::complex<double> prev_alpha, bool *alpha_available) {
   // Create a poll item for the ZMQ socket
   zmq_pollitem_t poll_items[] = { { subscriber, 0, ZMQ_POLLIN, 0 } };
   
@@ -147,6 +148,7 @@ std::complex<double> poll_alpha(zmq::socket_t& subscriber, std::complex<double> 
     std::vector<double> alpha_parts = obj.as<std::vector<double>>();
     std::complex<double> alpha{alpha_parts[0], alpha_parts[1]};
     // std::cout << "Alpha: " << alpha << '\n';
+    *alpha_available = true;
 
     return alpha;
   } else {
@@ -176,15 +178,17 @@ void txrx::run_thread()
   zmq::socket_t subscriber(context_sub, ZMQ_SUB);
   zmq::socket_t publisher(context_pub, ZMQ_PUB);
   subscriber.connect("tcp://localhost:5556");
-  subscriber.set(zmq::sockopt::subscribe, "");
+  // subscriber.set(zmq::sockopt::subscribe, "");
+  subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
   publisher.bind("tcp://*:5555");
   /*
   Boolean variables to decide if:
   - to use MIMO-RIC
   - to apply alpha for BeamArmor's anti-jamming
   */
-  bool mimo_ric_on = false;
+  bool mimo_ric_on = true;
   bool beam_armor_on = true;
+  bool alpha_available = false; // Initialize to false, set to true once alpha is computed
 
   float samp_rate = srsran_sampling_freq_hz(worker_com->get_nof_prb(0));
 
@@ -292,10 +296,11 @@ void txrx::run_thread()
       /*
       Main code snippet that executes MIMO-RIC communication
       */
-      if (tti % 50 == 0)
+      // if ((tti % 50 == 0) && (alpha_available == false))
+      if ((tti % 50 == 0))
       {
         send_y1y2(y1, y2, tti, sf_len, publisher);
-        alpha = poll_alpha(subscriber, alpha);
+        alpha = poll_alpha(subscriber, alpha, &alpha_available);
       }
 
       /*
