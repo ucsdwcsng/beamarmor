@@ -49,12 +49,13 @@ if __name__ == "__main__":
     poller = zmq.Poller()
     poller.register(subscriber_socket, zmq.POLLIN)
 
-    compute_started_flag = 1
     sum_alpha = 0
     num_alpha = 0
 
-    alpha_estimation_timer = int(sys.argv[1])
-    alpha_application_timer = int(sys.argv[2])
+    alpha_estimation_timer = int(sys.argv[1]) # Timer 1 
+    alpha_application_timer = int(sys.argv[2]) # Timer 2
+
+    compute_started_flag = 1
     alpha_estimated_flag = 0
     alpha_applied_flag = 0
 
@@ -85,7 +86,7 @@ if __name__ == "__main__":
             except msgpack.exceptions.UnpackValueError:
                 pass
             
-            if elapsed_time < alpha_estimation_timer:
+            if elapsed_time < alpha_estimation_timer: # Estimate alpha till Timer 1 elapses
             # Compute alpha for BeamArmor's anti-jamming
                 alpha = compute_alpha(data)
                 sum_alpha = sum_alpha + alpha
@@ -95,20 +96,11 @@ if __name__ == "__main__":
                 print("Estimated alpha...")
                 alpha_estimated_flag = 1
 
-            # Saving 100 pairs of y1 and y2 to file
-            # if i < 100:
-            #     save_y1y2_file(data,i)
-            #     i = i+1
-            # else:
-            #     exit()
-
-            # Sending dummy alpha immediatley
-            # alpha = 0
-
             # Return alpha to srseNB
-            if elapsed_time < alpha_application_timer:
+            if elapsed_time < alpha_application_timer: # Send zeros until Timer 2 elapses
                 publisher_socket.send(dummy_msg)
             else:
+                # Average and send final alpha value to RAN
                 final_alpha = sum_alpha / num_alpha
                 alpha_msg = msgpack.packb([final_alpha.real, final_alpha.imag])
                 publisher_socket.send(alpha_msg)
