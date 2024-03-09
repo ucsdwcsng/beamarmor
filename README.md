@@ -29,7 +29,9 @@ For demonstartion purposes, we recommend to add two timer elements of e.g. 10 an
 3. Start the UE, await attachement, and start UL traffic. When observing the traffic metrics on the console at this point, the jammer influence should be visible through bad SINR, BLER, and throughput.
 4. After the second timer has elapsed, implement logic that starts applying the latest alpha value to the UL processing. Now, an impromvemet in the metrics should be visible and thus, verifying BeamArmors nulling effect.
 
-## BeamArmor Demo
+## BeamArmor Demo - Automatic BeamArmor turn ON
+In this demo setup, BeamArmor turn on time is set while running the RIC and BeamArmor will turn on automatically. 
+
 ### Setup
 #### Basestation/eNB setup
 eNB setup contains 4 components: 
@@ -58,7 +60,8 @@ These phases will be controlled from the basestation setup with the BeamArmor RI
 1. Turn on the jammer and let it transmit data continuously.
 
 2. On the UE PC, create a namespace for data transmission:  
-`sudo ip netns add ue1`  
+`sudo ip netns add ue1`
+
 This will be useful while trying to run iperf client through srsRAN from UE.
 
 4. Run Open5GS Core:  
@@ -67,7 +70,9 @@ This will be useful while trying to run iperf client through srsRAN from UE.
 5. Run srseNB:  
 `sudo /srsRAN/build/srsenb/sc/srsenb ~/.config/srsran/enb.conf`
 
-6. Run BeamArmor RIC:  
+Press 't' on the terminal to enable trace and display metrics.
+
+7. Run BeamArmor RIC:  
 `python3 alpha_compute_server.py <Timer 1> <Timer 2>`  
 
 Here Timer 1 and Timer 2 are the wait times in seconds for turning on the three phases of BeamArmor Demo.
@@ -79,19 +84,89 @@ UE is turned on and it connects to the basestation. BeamArmor RIC does not apply
 Once the Timer 2 expires, beam-nulling is applied and performance with BeamArmor is demostrated.
 
 ##### Example
-`python3 alpha_compute_server.py 10 40`  
-When the alpha_compute_server.py is run, the RIC estimates the channel for 10 seconds. After 10 seconds the UE should be turned on, and the performance without BeamArmor is demonstrated for 40 seconds. Then beam-nulling is applied and the performance of BeamArmor is demonstrated. 
+`python3 alpha_compute_server.py 10 40` 
+
+When the alpha_compute_server.py is run, the RIC estimates the channel for 10 seconds. After 10 seconds the UE should be turned on, and the performance without BeamArmor is demonstrated for 40 seconds. Then beam-nulling is applied and the performance improvement from BeamArmor is demonstrated. 
 
 6. Run iperf server:  
 `sudo iperf3 -s -i 1`
 
-7. Run srsUE:  
+7. Wait for <Timer 1> seconds and run srsUE:  
 `sudo /srsRAN/build/srsenb/sc/srsue ~/.config/srsran/ue.conf`
 
 8. Once the UE connects to the eNB, run iperf client:  
-`sudo ip netns exec ue1 iperf3 -c 172.16.0.1 -b 10M -i 1 -t 200`
+`sudo ip netns exec ue1 iperf3 -c 172.16.0.1 -b 10M -i 1 -t 2000`
 
-1. Both timer start counting down and the MIMO-RIC platform begins to regularly extract and send y1 and y2 to the controller. The controller will compute alpha and send the value back to the RAN stack, where it is not yet applied.
-2. After the first timer has elapsed, implement logic in txrx.cc that stops the y1y2_send operation and simply keeps the latest computed alpha value.
-3. Start the UE, await attachement, and start UL traffic. When observing the traffic metrics on the console at this point, the jammer influence should be visible through bad SINR, BLER, and throughput.
-4. After the second timer has elapsed, implement logic that starts applying the latest alpha value to the UL processing. Now, an impromvemet in the metrics should be visible and thus, verifying BeamArmors nulling effect.
+The improvement from BeamArmor must be visible once the Timer 2 expires. 
+
+## BeamArmor Demo - Manual BeamArmor turn ON/OFF
+In this demo setup, BeamArmor can be turned ON/OFF with a GUI. 
+
+### Setup
+#### Basestation/eNB setup
+eNB setup contains 4 components: 
+1. Core network - Open5GS
+2. Basestation RAN - srseNB
+3. BeamArmor Real-time controller (RIC) - alpha_compute_server.py
+4. Data exchange - iperf server
+
+#### User/UE setup
+UE setup contains 4 components: 
+1. UE RAN - srsUE
+2. Data exchange - iperf client
+
+#### Jammer
+Jammer setup uses one pendrive containing 5MHz OFDM IQ data which is transmitted continuously in the same UL frequency.
+
+### Phases of Demo
+There are three phases in the demo: 
+1. Estimating the jammer channel co-efficients - Only basestation and jammer are running.
+2. Demonstrating performance without applying beam-nulling - Basestation, jammer and user are running.
+3. Demonstrating performance after applying beam-nulling - Basestation, jammer and user are running.
+
+These phases will be controlled from the basestation setup with the BeamArmor RIC and control GUI.
+
+#### Demo procedure
+1. Turn on the jammer and let it transmit data continuously.
+
+2. On the UE PC, create a namespace for data transmission:  
+`sudo ip netns add ue1`
+
+This will be useful while trying to run iperf client through srsRAN from UE.
+
+4. Run Open5GS Core:  
+`sudo /srsRAN/build/srsepc/src/srsepc ~/.config/srsran/epc.conf`
+
+5. Run srseNB:  
+`sudo /srsRAN/build/srsenb/sc/srsenb ~/.config/srsran/enb.conf`
+
+7. Run BeamArmor RIC:  
+`python3 alpha_compute_server.py <Timer 1> <Timer 2>`  
+
+Here Timer 1 is the wait times in seconds for estimating the channel of jammer.
+##### Timer 1
+Only the eNB and jammer are running, UE should not be turned on yet. During this phase, the RIC estimates the channel co-efficients of the jammer given the UE is turned off. 
+
+**Note: A GUI window will open from which BeamArmor can be turned ON or OFF. Try to arrange the GUI at the bottom corner, so that it does not overlap with the metric plots which is programmed to be displayed in the top half of the computer screen.
+
+##### Example
+`python3 alpha_compute_server_toggle.py 10` 
+
+When the alpha_compute_server_toggle.py is run, the RIC estimates the channel for 10 seconds. After 10 seconds the UE should be turned on, and the performance without BeamArmor is demonstrated for 40 seconds. Then beam-nulling is applied and the performance improvement from BeamArmor is demonstrated. 
+
+Press 't' in the eNB terminal window to open up metrics from srsRAN and display plots.
+
+**Note: The plots refresh everytime there is a new data point and they plot windows come into focus everytime they refresh, so it might be difficult to access other windows. So try to turn on the metrics after all the necessary commands are run and you need not access the basestation for a significant duration.
+
+6. Run iperf server:  
+`sudo iperf3 -s -i 1`
+
+7. Wait for <Timer 1> seconds and run srsUE:  
+`sudo /srsRAN/build/srsenb/sc/srsue ~/.config/srsran/ue.conf`
+
+8. Once the UE connects to the eNB, run iperf client:  
+`sudo ip netns exec ue1 iperf3 -c 172.16.0.1 -b 10M -i 1 -t 2000`
+
+A GUI should be open up with BeamArmor. You can turn ON/OFF BeamArmor with the button and the metrics should reflect the effect of BeamArmor being ON/OFF. 
+
+
