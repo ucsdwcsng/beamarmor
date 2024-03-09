@@ -145,14 +145,14 @@ This will be useful while trying to run iperf client through srsRAN from UE.
 
 Here Timer 1 is the wait times in seconds for estimating the channel of jammer.
 ##### Timer 1
-Only the eNB and jammer are running, UE should not be turned on yet. During this phase, the RIC estimates the channel co-efficients of the jammer given the UE is turned off. 
+Only the eNB and jammer are running, UE should not be turned on yet. During this phase, the RIC estimates the channel co-efficients of the jammer given the UE is turned off. Once the Timer 1 expires, turn ON the UE and let it connect to the eNB. Now you can control BeamArmor with the GUI. 
 
 **Note: A GUI window will open from which BeamArmor can be turned ON or OFF. Try to arrange the GUI at the bottom corner, so that it does not overlap with the metric plots which is programmed to be displayed in the top half of the computer screen.
 
 ##### Example
 `python3 alpha_compute_server_toggle.py 10` 
 
-When the alpha_compute_server_toggle.py is run, the RIC estimates the channel for 10 seconds. After 10 seconds the UE should be turned on, and the performance without BeamArmor is demonstrated for 40 seconds. Then beam-nulling is applied and the performance improvement from BeamArmor is demonstrated. 
+When the alpha_compute_server_toggle.py is run, the RIC estimates the channel for 10 seconds. After 10 seconds the UE should be turned on. Once the UE is connected, you can apply beam-nulling or turn it off using the GUI. 
 
 Press 't' in the eNB terminal window to open up metrics from srsRAN and display plots.
 
