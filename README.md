@@ -24,17 +24,17 @@ The controller itself is run in form of the Python script compute_alpha_server.p
 
 ## Files under concern
 The following will be the main files that need to modified to turn ON and tune the parameters of BeamArmor:
-1. beamarmor/srsRAN/srsenb/src/phy/txrx.cc - Turn BeamArmor ON/OFF from the RAN side, communication with BeamArmor RIC (python script through ZMQ) and its periodicity and down-sampling rate.
-2. beamarmor/srsRAN/srsenb/hdr/beamArmorGUI.h - Extract the metrics and plot them with gnuplot library.
-3. alpha_compute_server.py - BeamArmor RIC for jammer channel estimation.
-4. alpha_computer_server_toggle.py - BeamArmor RIC for jammer channel estimation with GUI to turn BeamArmor ON/OFF for live demos. 
+1. [beamarmor/srsRAN/srsenb/src/phy/txrx.cc](https://github.com/ucsdwcsng/beamarmor/blob/demo_feb27/srsRAN/srsenb/src/phy/txrx.cc) - Turn BeamArmor ON/OFF from the RAN side, communication with BeamArmor RIC (python script through ZMQ) and its periodicity and down-sampling rate.
+2. [beamarmor/srsRAN/srsenb/hdr/beamArmorGUI.h](https://github.com/ucsdwcsng/beamarmor/blob/demo_feb27/srsRAN/srsenb/hdr/beamArmorGUI.h) - Extract the metrics and plot them with gnuplot library.
+3. [alpha_compute_server.py](https://github.com/ucsdwcsng/beamarmor/blob/demo_feb27/alpha_compute_server.py) - BeamArmor RIC for jammer channel estimation.
+4. [alpha_computer_server_toggle.py](https://github.com/ucsdwcsng/beamarmor/blob/demo_feb27/alpha_compute_server_toggle.py) - BeamArmor RIC for jammer channel estimation with GUI to turn BeamArmor ON/OFF for live demos. 
 
 ## Parameters of MIMO-RIC
 To change the periodicity, look for the function calls 'send_y1y2' and 'poll_alpha' inside the run_thread() method (txrx.cc), and set the if-condition 'if (tti % 50 == 0)' to any value you prefer instead of every 50 TTI.
 The MIMO-RIC logic includes sending the IQ samples recevied by antenna ports 1 and 2 of the srsenb to the controller. The down-sampling rate of these IQ samples can be adjusted inside the 'send_y1y2' function in /srsRAN/srsenb/src/phy/txrx.cc. To do so, adjust the increment value of the for-loop 'for (int i = 0; i < (int)sf_len; i += 40). Currently, the down-sampling rate is 40x. When adjusting the down-sampling rate, the variable 'int size = (int)sf_len/10;' must be adjusted accordingly.
 
 ## BeamArmor Demo: Automatic BeamArmor turn ON
-In this demo setup, BeamArmor turn on time is set while running the RIC and BeamArmor will turn on automatically. 
+In this demo setup, BeamArmor turn on time is set while running the RIC and BeamArmor will turn on automatically. This demo uses alpha_compute_server.py. There will be no intervention required once the started. 
 
 ### Setup
 #### Basestation/eNB setup
@@ -104,7 +104,7 @@ When the alpha_compute_server.py is run, the RIC estimates the channel for 10 se
 The improvement from BeamArmor must be visible once the Timer 2 expires. 
 
 ## BeamArmor Demo: Manual BeamArmor turn ON/OFF
-In this demo setup, BeamArmor can be turned ON/OFF with a GUI. 
+In this demo setup, BeamArmor can be turned ON/OFF with a GUI. This demo uses alpha_compute_server_toggle.py. The RIC can be controlled with a GUI.  
 
 ### Setup
 #### Basestation/eNB setup
