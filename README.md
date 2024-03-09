@@ -9,8 +9,8 @@ One of these Apps is BeamArmor, which is included in this repo. BeamArmor is a n
 2. [Preparing BeamArmor and MIMO-RIC](#preparing-beamarmor-and-mimo-ric)
 3. [Files under concern](#files-under-concern)
 4. [Parameters of MIMO-RIC](#parameters-of-mimo-ric)
-5. [BeamArmor Demo - Automatic BeamArmor turn ON](#beamarmor-demo-automatic-beamarmor-turn-on)
-6. [## BeamArmor Demo - Manual BeamArmor turn ON/OFF](##beamarmor-demo-manual-beamarmor-turn-on/off)
+5. [BeamArmor Demo: Automatic BeamArmor turn ON](#beamarmor-demo:-automatic-beamarmor-turn-on)
+6. [BeamArmor Demo: Manual BeamArmor turn ON/OFF](##beamarmor-demo:-manual-beamarmor-turn-on/off)
    
 ## Installing the repo
 Installation is done by building srsRAN in the default manner. Create a build directory inside srsRAN, run cmake ../ and make inside the build directory. cmake might output missing modules like for example, msgpack, that have to be installed first before running make. The default configuration file enb.conf can be installed from the srsRAN/build/ directory by executing 'srsran_install_configs.sh'.
@@ -33,7 +33,7 @@ The following will be the main files that need to modified to turn ON and tune t
 To change the periodicity, look for the function calls 'send_y1y2' and 'poll_alpha' inside the run_thread() method (txrx.cc), and set the if-condition 'if (tti % 50 == 0)' to any value you prefer instead of every 50 TTI.
 The MIMO-RIC logic includes sending the IQ samples recevied by antenna ports 1 and 2 of the srsenb to the controller. The down-sampling rate of these IQ samples can be adjusted inside the 'send_y1y2' function in /srsRAN/srsenb/src/phy/txrx.cc. To do so, adjust the increment value of the for-loop 'for (int i = 0; i < (int)sf_len; i += 40). Currently, the down-sampling rate is 40x. When adjusting the down-sampling rate, the variable 'int size = (int)sf_len/10;' must be adjusted accordingly.
 
-## BeamArmor Demo - Automatic BeamArmor turn ON
+## BeamArmor Demo: Automatic BeamArmor turn ON
 In this demo setup, BeamArmor turn on time is set while running the RIC and BeamArmor will turn on automatically. 
 
 ### Setup
@@ -103,7 +103,7 @@ When the alpha_compute_server.py is run, the RIC estimates the channel for 10 se
 
 The improvement from BeamArmor must be visible once the Timer 2 expires. 
 
-## BeamArmor Demo - Manual BeamArmor turn ON/OFF
+## BeamArmor Demo: Manual BeamArmor turn ON/OFF
 In this demo setup, BeamArmor can be turned ON/OFF with a GUI. 
 
 ### Setup
