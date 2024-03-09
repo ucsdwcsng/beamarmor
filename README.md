@@ -10,7 +10,7 @@ One of these Apps is BeamArmor, which is included in this repo. BeamArmor is a n
 3. [Files under concern](#files-under-concern)
 4. [Parameters of MIMO-RIC](#parameters-of-mimo-ric)
 5. [BeamArmor Demo: Automatic BeamArmor turn ON](#beamarmor-demo-automatic-beamarmor-turn-on)
-6. [BeamArmor Demo: Manual BeamArmor turn ON/OFF](##beamarmor-demo-manual-beamarmor-turn-on/off)
+6. [BeamArmor Demo: Manual BeamArmor turn ON/OFF](##beamarmor-demo-manual-beamarmor-turn-onoff)
    
 ## Installing the repo
 Installation is done by building srsRAN in the default manner. Create a build directory inside srsRAN, run cmake ../ and make inside the build directory. cmake might output missing modules like for example, msgpack, that have to be installed first before running make. The default configuration file enb.conf can be installed from the srsRAN/build/ directory by executing 'srsran_install_configs.sh'.
