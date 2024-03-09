@@ -57,18 +57,18 @@ These phases will be controlled from the basestation setup with the BeamArmor RI
 #### Demo procedure
 1. Turn on the jammer and let it transmit data continuously.
 
-2. On the UE PC, create a namespace for data transmission:
-`sudo ip netns add ue1`
+2. On the UE PC, create a namespace for data transmission:  
+`sudo ip netns add ue1`  
 This will be useful while trying to run iperf client through srsRAN from UE.
 
-3. Run Open5GS Core:  
+4. Run Open5GS Core:  
 `sudo /srsRAN/build/srsepc/src/srsepc ~/.config/srsran/epc.conf`
 
-4. Run srseNB:  
+5. Run srseNB:  
 `sudo /srsRAN/build/srsenb/sc/srsenb ~/.config/srsran/enb.conf`
 
-5. Run BeamArmor RIC:
-`python3 alpha_compute_server.py <Timer 1> <Timer 2>`
+6. Run BeamArmor RIC:  
+`python3 alpha_compute_server.py <Timer 1> <Timer 2>`  
 
 Here Timer 1 and Timer 2 are the wait times in seconds for turning on the three phases of BeamArmor Demo.
 ##### Timer 1
@@ -79,18 +79,17 @@ UE is turned on and it connects to the basestation. BeamArmor RIC does not apply
 Once the Timer 2 expires, beam-nulling is applied and performance with BeamArmor is demostrated.
 
 ##### Example
-`python3 alpha_compute_server.py 10 40`
+`python3 alpha_compute_server.py 10 40`  
 When the alpha_compute_server.py is run, the RIC estimates the channel for 10 seconds. After 10 seconds the UE should be turned on, and the performance without BeamArmor is demonstrated for 40 seconds. Then beam-nulling is applied and the performance of BeamArmor is demonstrated. 
 
-6. Run iperf server:
+6. Run iperf server:  
 `sudo iperf3 -s -i 1`
 
-7. Run srsUE:
+7. Run srsUE:  
 `sudo /srsRAN/build/srsenb/sc/srsue ~/.config/srsran/ue.conf`
 
-8. Once the UE connects to the eNB, run iperf client:
+8. Once the UE connects to the eNB, run iperf client:  
 `sudo ip netns exec ue1 iperf3 -c 172.16.0.1 -b 10M -i 1 -t 200`
-
 
 1. Both timer start counting down and the MIMO-RIC platform begins to regularly extract and send y1 and y2 to the controller. The controller will compute alpha and send the value back to the RAN stack, where it is not yet applied.
 2. After the first timer has elapsed, implement logic in txrx.cc that stops the y1y2_send operation and simply keeps the latest computed alpha value.
