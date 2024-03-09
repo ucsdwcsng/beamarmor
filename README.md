@@ -107,7 +107,7 @@ In this demo setup, BeamArmor can be turned ON/OFF with a GUI.
 eNB setup contains 4 components: 
 1. Core network - Open5GS
 2. Basestation RAN - srseNB
-3. BeamArmor Real-time controller (RIC) - alpha_compute_server.py
+3. BeamArmor Real-time controller (RIC) - alpha_compute_server_toggle.py
 4. Data exchange - iperf server
 
 #### User/UE setup
@@ -141,7 +141,7 @@ This will be useful while trying to run iperf client through srsRAN from UE.
 `sudo /srsRAN/build/srsenb/sc/srsenb ~/.config/srsran/enb.conf`
 
 7. Run BeamArmor RIC:  
-`python3 alpha_compute_server.py <Timer 1> <Timer 2>`  
+`python3 alpha_compute_server_toggle.py <Timer 1>`  
 
 Here Timer 1 is the wait times in seconds for estimating the channel of jammer.
 ##### Timer 1
