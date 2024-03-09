@@ -4,6 +4,14 @@ This is a wireless system build on top of srsRAN's 4G software RAN stack.
 It contains an O-RAN driven RIC named MIMO-RIC that is specifically geared towards hosting MIMO-related xApps/μApps.
 One of these Apps is BeamArmor, which is included in this repo. BeamArmor is a null-steering enabled anti-jamming application that can mitigate the interference effect of jamming signals in UL traffic.
 
+## Sections
+1. [Installing the repo](#installing-the-repo)
+2. [Preparing BeamArmor and MIMO-RIC](#preparing-beamarmor-and-mimo-ric)
+3. [Files under concern](#files-under-concern)
+4. [Parameters of MIMO-RIC](#parameters-of-mimo-ric)
+5. [BeamArmor Demo - Automatic BeamArmor turn ON](#beamarmor-demo-automatic-beamarmor-turn-on)
+6. [## BeamArmor Demo - Manual BeamArmor turn ON/OFF](##beamarmor-demo-manual-beamarmor-turn-on/off)
+   
 ## Installing the repo
 Installation is done by building srsRAN in the default manner. Create a build directory inside srsRAN, run cmake ../ and make inside the build directory. cmake might output missing modules like for example, msgpack, that have to be installed first before running make. The default configuration file enb.conf can be installed from the srsRAN/build/ directory by executing 'srsran_install_configs.sh'.
 
@@ -20,10 +28,6 @@ The following will be the main files that need to modified to turn ON and tune t
 2. beamarmor/srsRAN/srsenb/hdr/beamArmorGUI.h - Extract the metrics and plot them with gnuplot library.
 3. alpha_compute_server.py - BeamArmor RIC for jammer channel estimation.
 4. alpha_computer_server_toggle.py - BeamArmor RIC for jammer channel estimation with GUI to turn BeamArmor ON/OFF for live demos. 
-
-## Running the srsenb with MIMO-RIC and BeamArmor
-The srsRAN base station can be run by executing the core application srsepc and the base station application srsenb. Execute 'sudo /srsRAN/build/srsepc/src/srsepc ~/.config/srsran/epc.conf' followed by 'sudo /srsRAN/build/srsenb/sc/srsenb ~/.config/srsran/enb.conf' in another terminal.
-Execute the Python script inside a 3rd terminal to run the controller by executing 'python3 alpha_compute_server.py'. From now on, the srsenb program communicates at a set periodicity with the MIMO-RIC.
 
 ## Parameters of MIMO-RIC
 To change the periodicity, look for the function calls 'send_y1y2' and 'poll_alpha' inside the run_thread() method (txrx.cc), and set the if-condition 'if (tti % 50 == 0)' to any value you prefer instead of every 50 TTI.
