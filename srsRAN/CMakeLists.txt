@@ -160,6 +160,12 @@ endif()
 # Threads
 find_package(Threads REQUIRED)
 
+# BeamArmor GUI
+# Find FLTK
+find_package(FLTK REQUIRED)
+include_directories(${FLTK_INCLUDE_DIRS})
+link_directories(${FLTK_LIBRARY})
+
 # FFT
 if(USE_MKL)
   find_package(MKL REQUIRED)

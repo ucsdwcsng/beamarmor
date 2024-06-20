@@ -33,6 +33,11 @@
 
 #include "srsran/interfaces/enb_metrics_interface.h"
 
+// BeamArmor GUI
+extern double bler;
+extern double sinr;
+extern double throughput;
+
 namespace srsenb {
 
 class metrics_stdout : public srsran::metrics_listener<enb_metrics_t>

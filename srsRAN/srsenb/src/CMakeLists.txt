@@ -22,6 +22,8 @@ add_subdirectory(common)
 add_subdirectory(phy)
 add_subdirectory(stack)
 
+set(CXX_STANDARD 17)
+set(CXX_STANDARD_REQUIRED True)
 
 # Link libstdc++ and libgcc
 if(BUILD_STATIC)
@@ -44,13 +46,29 @@ set(SRSRAN_SOURCES srsran_common srsran_mac srsran_phy srsran_gtpu srsran_rlc sr
 set(SRSENB_SOURCES ${SRSENB_SOURCES} srsgnb_stack srsgnb_ngap srsgnb_mac srsgnb_rrc)
 set(SRSRAN_SOURCES ${SRSRAN_SOURCES} rrc_nr_asn1 ngap_nr_asn1)
 
+# find_package(Matplot++ REQUIRED)
 target_link_libraries(srsenb  ${SRSENB_SOURCES}
                               ${SRSRAN_SOURCES}
                               ${CMAKE_THREAD_LIBS_INIT}
                               ${Boost_LIBRARIES}
                               ${SEC_LIBRARIES}
                               ${LIBCONFIGPP_LIBRARIES}
-                              ${SCTP_LIBRARIES})
+                              ${SCTP_LIBRARIES}
+                              ${FLTK_LIBRARY}
+                              -lfontconfig 
+                              -lXft 
+                              -lX11 
+                              -lXrender
+                              -lmatplot 
+                              -lz 
+                              -lpng 
+                              -ljpeg 
+                              # "/usr/local/lib/x86_64-linux-gnu/libtiff.so"
+                              "/usr/local/lib/Matplot++/libnodesoup.a"
+                              -lboost_iostreams 
+                              -lboost_system 
+                              -lboost_filesystem
+                              -ltiff)
 
 if (RPATH)
   set_target_properties(srsenb PROPERTIES INSTALL_RPATH ".")

@@ -30,6 +30,11 @@
 #include <strings.h>
 #include <unistd.h>
 
+// BeamArmor GUI
+double bler;
+double sinr;
+double throughput;
+
 using namespace srsenb;
 
 namespace srsenb {

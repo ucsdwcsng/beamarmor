@@ -48,6 +48,13 @@
 #include "srsenb/hdr/metrics_stdout.h"
 #include "srsran/common/enb_events.h"
 
+// BeamArmor GUI
+#include <X11/Xlib.h> 
+#include "srsenb/hdr/beamArmorGUI.h"
+double bler = 0.0;
+double sinr = 0.0;
+double throughput = 0.0;
+
 using namespace std;
 using namespace srsenb;
 namespace bpo = boost::program_options;
@@ -498,6 +505,7 @@ static void execute_cmd(metrics_stdout* metrics, srsenb::enb_command_interface* 
       cout << "Enter t to restart trace." << endl;
     }
     metrics->toggle_print(do_metrics);
+    start_beamArmorGUI();
   } else if (cmd[0] == "m") {
     // Trigger cell measurements
     control->cmd_cell_measure();
@@ -609,6 +617,9 @@ int main(int argc, char* argv[])
   metrics_stdout                     metrics_screen;
 
   cout << "---  Software Radio Systems LTE eNodeB  ---" << endl << endl;
+  
+  // BeamArmor GUI
+  XInitThreads();
 
   srsran_debug_handle_crash(argc, argv);
   parse_args(&args, argc, argv);
